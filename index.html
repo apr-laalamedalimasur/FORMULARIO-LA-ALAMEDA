@@ -82,20 +82,20 @@ footer{text-align:center; color:var(--ink-soft); font-size:11px; margin-top:20px
 
   <div class="hero">
     <p class="eyebrow">Asociación Alameda Lima Sur</p>
-    <h1>Actualiza tus datos o llena la ficha de censo</h1>
+    <h1>Verifica si estás empadronado o actualiza tus datos</h1>
     <p>Completa el formulario y envíalo por WhatsApp o correo — no necesitas crear ninguna cuenta.</p>
   </div>
 
   <div class="seg" id="seg">
-    <button class="active" data-s="datos">Actualiza tus datos</button>
-    <button data-s="censo">Ficha de censo</button>
+    <button class="active" data-s="datos">Verifica si estás empadronado</button>
+    <button data-s="censo">Actualiza tus datos padrón</button>
   </div>
 
   <!-- ===== ACTUALIZA TUS DATOS ===== -->
   <div class="section active" id="sec-datos">
     <div class="card">
-      <h2>Actualiza tus datos</h2>
-      <p class="sub">Identifícate con tu DNI para que se pueda emparejar con tu registro en el padrón.</p>
+      <h2>Verifica si estás empadronado</h2>
+      <p class="sub">Escribe tu DNI para verificar si ya estás registrado en el padrón de asociados. Si lo estás, revisa/actualiza tus datos aquí. Si no apareces, ve a "Actualiza tus datos padrón" para registrarte.</p>
       <div class="grid2">
         <div class="field"><label>DNI</label><input type="text" id="as_dni"></div>
         <div class="field"><label>Nombres</label><input type="text" id="as_nombres"></div>
@@ -143,7 +143,7 @@ footer{text-align:center; color:var(--ink-soft); font-size:11px; margin-top:20px
   <!-- ===== FICHA DE CENSO ===== -->
   <div class="section" id="sec-censo">
     <div class="card">
-      <h2>Ficha de registro y censo de predios</h2>
+      <h2>Actualiza tus datos padrón · Ficha de registro y censo de predios</h2>
       <p class="sub">Urb. La Alameda Lima Sur · Villa del Sur 1, 2 y 3. Complétala aunque no seas asociado todavía.</p>
       <div class="grid2">
         <div class="field full"><label>Sector</label>
@@ -507,7 +507,7 @@ async function enviarDatosCorreo(){
   if(!document.getElementById("as_consiento").checked){ document.getElementById("as_msg").innerHTML='<div class="msg err">Debes autorizar el uso de tus datos personales.</div>'; return; }
   setBotonesHabilitados("as", false);
   const estado = await guardarEnHoja(construirPayloadDatos());
-  const asunto = "Actualización de datos - "+val("as_nombres")+" "+val("as_apellidos");
+  const asunto = "Verificación de empadronamiento - "+val("as_nombres")+" "+val("as_apellidos");
   window.open(`mailto:${encodeURIComponent(CONTACTO_EMAIL)}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(construirMensajeDatos())}`, "_blank");
   document.getElementById("as_msg").innerHTML='<div class="msg ok">Intentamos abrir tu correo. Si no pasó nada, usa "Copiar mensaje" abajo y pégalo donde puedas enviarlo.'+textoGuardado(estado)+'</div>';
   if(estado==="error") setBotonesHabilitados("as", true);
@@ -526,7 +526,7 @@ async function enviarCensoCorreo(){
   if(!document.getElementById("cn_consiento").checked){ document.getElementById("cn_msg").innerHTML='<div class="msg err">Debes autorizar el uso de tus datos personales.</div>'; return; }
   setBotonesHabilitados("cn", false);
   const estado = await guardarEnHoja(construirPayloadCenso());
-  const asunto = "Ficha de censo - "+val("cn_nombres")+" "+val("cn_apellidos");
+  const asunto = "Actualiza tus datos padrón - "+val("cn_nombres")+" "+val("cn_apellidos");
   window.open(`mailto:${encodeURIComponent(CONTACTO_EMAIL)}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(construirMensajeCenso())}`, "_blank");
   document.getElementById("cn_msg").innerHTML='<div class="msg ok">Intentamos abrir tu correo. Si no pasó nada, usa "Copiar mensaje" abajo y pégalo donde puedas enviarlo.'+textoGuardado(estado)+'</div>';
   if(estado==="error") setBotonesHabilitados("cn", true);
