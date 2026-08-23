@@ -56,6 +56,7 @@ body{margin:0; background:var(--bg); color:var(--ink); font-family:'Inter',sans-
 
 .send-row{display:flex; flex-direction:column; gap:8px; margin-top:16px;}
 .btn{border:none; border-radius:10px; padding:13px 16px; font-weight:700; font-size:14px; cursor:pointer; font-family:'Inter',sans-serif;}
+.btn:disabled{opacity:.5; cursor:not-allowed;}
 .btn-wa{background:#25D366; color:#fff;}
 .btn-mail{background:var(--primary); color:#fff;}
 .btn-copy{background:none; border:1.5px dashed var(--line); color:var(--ink-soft); font-weight:600;}
@@ -467,20 +468,23 @@ let datosGuardadoEnHoja = false;
 let censoGuardadoEnHoja = false;
 async function guardarEnHoja(payload){
   if(!APPS_SCRIPT_URL) return "no-configurado";
-  if(payload.tipo==="datos"){ if(datosGuardadoEnHoja) return "ya-guardado"; }
-  if(payload.tipo==="censo"){ if(censoGuardadoEnHoja) return "ya-guardado"; }
+  if(payload.tipo==="datos"){ if(datosGuardadoEnHoja) return "ya-guardado"; datosGuardadoEnHoja = true; }
+  if(payload.tipo==="censo"){ if(censoGuardadoEnHoja) return "ya-guardado"; censoGuardadoEnHoja = true; }
   try{
     await fetch(APPS_SCRIPT_URL, { method:"POST", mode:"no-cors", body: JSON.stringify(payload) });
-    if(payload.tipo==="datos") datosGuardadoEnHoja = true;
-    if(payload.tipo==="censo") censoGuardadoEnHoja = true;
     return "ok";
   }catch(e){
     console.error("No se pudo guardar en la hoja de cálculo", e);
+    if(payload.tipo==="datos") datosGuardadoEnHoja = false;
+    if(payload.tipo==="censo") censoGuardadoEnHoja = false;
     return "error";
   }
 }
-document.getElementById("sec-datos").addEventListener("input", function(){ datosGuardadoEnHoja = false; });
-document.getElementById("sec-censo").addEventListener("input", function(){ censoGuardadoEnHoja = false; });
+document.getElementById("sec-datos").addEventListener("input", function(){ datosGuardadoEnHoja = false; setBotonesHabilitados("as", true); });
+document.getElementById("sec-censo").addEventListener("input", function(){ censoGuardadoEnHoja = false; setBotonesHabilitados("cn", true); });
+function setBotonesHabilitados(prefijo, habilitado){
+  document.querySelectorAll('#sec-'+(prefijo==="as"?"datos":"censo")+' .btn').forEach(function(b){ b.disabled = !habilitado; });
+}
 
 /* ---- Envíos ---- */
 function textoGuardado(estado){
@@ -492,32 +496,40 @@ function textoGuardado(estado){
 async function enviarDatosWhatsapp(){
   if(!val("as_nombres")||!val("as_dni")){ document.getElementById("as_msg").innerHTML='<div class="msg err">Ingresa al menos tu nombre y tu DNI.</div>'; return; }
   if(!document.getElementById("as_consiento").checked){ document.getElementById("as_msg").innerHTML='<div class="msg err">Debes autorizar el uso de tus datos personales.</div>'; return; }
+  setBotonesHabilitados("as", false);
   const estado = await guardarEnHoja(construirPayloadDatos());
   window.open(`https://wa.me/${telefonoWa(CONTACTO_TEL)}?text=${encodeURIComponent(construirMensajeDatos())}`, "_blank");
   document.getElementById("as_msg").innerHTML='<div class="msg ok">Intentamos abrir WhatsApp. Si no pasó nada, usa "Copiar mensaje" abajo y pégalo donde puedas enviarlo.'+textoGuardado(estado)+'</div>';
+  if(estado==="error") setBotonesHabilitados("as", true);
 }
 async function enviarDatosCorreo(){
   if(!val("as_nombres")||!val("as_dni")){ document.getElementById("as_msg").innerHTML='<div class="msg err">Ingresa al menos tu nombre y tu DNI.</div>'; return; }
   if(!document.getElementById("as_consiento").checked){ document.getElementById("as_msg").innerHTML='<div class="msg err">Debes autorizar el uso de tus datos personales.</div>'; return; }
+  setBotonesHabilitados("as", false);
   const estado = await guardarEnHoja(construirPayloadDatos());
   const asunto = "Actualización de datos - "+val("as_nombres")+" "+val("as_apellidos");
   window.open(`mailto:${encodeURIComponent(CONTACTO_EMAIL)}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(construirMensajeDatos())}`, "_blank");
   document.getElementById("as_msg").innerHTML='<div class="msg ok">Intentamos abrir tu correo. Si no pasó nada, usa "Copiar mensaje" abajo y pégalo donde puedas enviarlo.'+textoGuardado(estado)+'</div>';
+  if(estado==="error") setBotonesHabilitados("as", true);
 }
 async function enviarCensoWhatsapp(){
   if(!val("cn_nombres")||!val("cn_dni")){ document.getElementById("cn_msg").innerHTML='<div class="msg err">Ingresa al menos tu nombre y tu DNI.</div>'; return; }
   if(!document.getElementById("cn_consiento").checked){ document.getElementById("cn_msg").innerHTML='<div class="msg err">Debes autorizar el uso de tus datos personales.</div>'; return; }
+  setBotonesHabilitados("cn", false);
   const estado = await guardarEnHoja(construirPayloadCenso());
   window.open(`https://wa.me/${telefonoWa(CONTACTO_TEL)}?text=${encodeURIComponent(construirMensajeCenso())}`, "_blank");
   document.getElementById("cn_msg").innerHTML='<div class="msg ok">Intentamos abrir WhatsApp. Si no pasó nada, usa "Copiar mensaje" abajo y pégalo donde puedas enviarlo.'+textoGuardado(estado)+'</div>';
+  if(estado==="error") setBotonesHabilitados("cn", true);
 }
 async function enviarCensoCorreo(){
   if(!val("cn_nombres")||!val("cn_dni")){ document.getElementById("cn_msg").innerHTML='<div class="msg err">Ingresa al menos tu nombre y tu DNI.</div>'; return; }
   if(!document.getElementById("cn_consiento").checked){ document.getElementById("cn_msg").innerHTML='<div class="msg err">Debes autorizar el uso de tus datos personales.</div>'; return; }
+  setBotonesHabilitados("cn", false);
   const estado = await guardarEnHoja(construirPayloadCenso());
   const asunto = "Ficha de censo - "+val("cn_nombres")+" "+val("cn_apellidos");
   window.open(`mailto:${encodeURIComponent(CONTACTO_EMAIL)}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(construirMensajeCenso())}`, "_blank");
   document.getElementById("cn_msg").innerHTML='<div class="msg ok">Intentamos abrir tu correo. Si no pasó nada, usa "Copiar mensaje" abajo y pégalo donde puedas enviarlo.'+textoGuardado(estado)+'</div>';
+  if(estado==="error") setBotonesHabilitados("cn", true);
 }
 async function copiarAlPortapapeles(texto, msgElId, sufijo){
   try{
@@ -530,14 +542,18 @@ async function copiarAlPortapapeles(texto, msgElId, sufijo){
 async function copiarDatos(){
   if(!val("as_nombres")||!val("as_dni")){ document.getElementById("as_msg").innerHTML='<div class="msg err">Ingresa al menos tu nombre y tu DNI.</div>'; return; }
   if(!document.getElementById("as_consiento").checked){ document.getElementById("as_msg").innerHTML='<div class="msg err">Debes autorizar el uso de tus datos personales.</div>'; return; }
+  setBotonesHabilitados("as", false);
   const estado = await guardarEnHoja(construirPayloadDatos());
-  copiarAlPortapapeles(construirMensajeDatos(), "as_msg", textoGuardado(estado));
+  await copiarAlPortapapeles(construirMensajeDatos(), "as_msg", textoGuardado(estado));
+  if(estado==="error") setBotonesHabilitados("as", true);
 }
 async function copiarCenso(){
   if(!val("cn_nombres")||!val("cn_dni")){ document.getElementById("cn_msg").innerHTML='<div class="msg err">Ingresa al menos tu nombre y tu DNI.</div>'; return; }
   if(!document.getElementById("cn_consiento").checked){ document.getElementById("cn_msg").innerHTML='<div class="msg err">Debes autorizar el uso de tus datos personales.</div>'; return; }
+  setBotonesHabilitados("cn", false);
   const estado = await guardarEnHoja(construirPayloadCenso());
-  copiarAlPortapapeles(construirMensajeCenso(), "cn_msg", textoGuardado(estado));
+  await copiarAlPortapapeles(construirMensajeCenso(), "cn_msg", textoGuardado(estado));
+  if(estado==="error") setBotonesHabilitados("cn", true);
 }
 </script>
 </body>
