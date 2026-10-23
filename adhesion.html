@@ -264,7 +264,7 @@ $("enviar").addEventListener("click", async ()=>{
   CODIGO = (new URLSearchParams(location.search).get("c") || "").trim().toUpperCase();
   if(!/^[A-Z0-9_-]{3,40}$/.test(CODIGO)) return mostrarError(msg("codigo"));
   try{
-    const c = await apiGet({accion:"convocatoria", c:CODIGO});
+    const c = await apiGet({accion:"convocatoria", cod:CODIGO});
     if(!c.ok) return mostrarError(msg(c.error));
     pintarConvocatoria(c);
     $("cargando").classList.add("hidden"); $("contenido").classList.remove("hidden");
