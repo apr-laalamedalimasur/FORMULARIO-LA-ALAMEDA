@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adhesión a convocatoria — Alameda Lima Sur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF2EF; --paper:#FFFFFF; --ink:#182823; --ink-soft:#4B5D57;
+  --line:#D7E0DA; --line-soft:#E7ECE8; --primary:#1F5C4F; --primary-dark:#123D34;
+  --accent:#C4882F; --accent-soft:#F3E2C3; --ok:#2F8558; --ok-bg:#E5F3EA;
+  --bad:#AF4B37; --bad-bg:#FBE9E4;
+}
+*{box-sizing:border-box;}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:'Inter',sans-serif; min-height:100vh;}
+.app{max-width:680px; margin:0 auto; padding:20px 16px 70px;}
+.hero{background:var(--primary); border-radius:14px; padding:20px; color:#fff; margin-bottom:16px;}
+.hero .eyebrow{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent-soft); margin:0 0 6px;}
+.hero h1{font-family:'Fraunces',serif; font-size:19px; margin:0 0 6px; line-height:1.3;}
+.hero p{margin:0; font-size:12.5px; color:#D7E6DE; line-height:1.5;}
+.card{background:var(--paper); border:1px solid var(--line); border-radius:12px; padding:18px; margin-bottom:16px;}
+.card h2{font-family:'Fraunces',serif; font-size:16px; margin:0 0 4px;}
+.card .sub{color:var(--ink-soft); font-size:12.5px; margin:0 0 12px; line-height:1.5;}
+.conv h3.t{font-family:'Fraunces',serif; font-size:17px; text-align:center; margin:0 0 6px; color:var(--primary-dark);}
+.conv h4.st{font-size:13px; text-align:center; margin:0 0 12px; color:var(--ink-soft); letter-spacing:.03em;}
+.conv h5.en{font-size:13px; margin:14px 0 4px; color:var(--primary-dark);}
+.conv p{font-size:13.5px; line-height:1.65; margin:0 0 9px; white-space:pre-line;}
+.conv ol,.conv ul{margin:0 0 10px; padding-left:22px; font-size:13.5px; line-height:1.6;}
+.conv li{margin-bottom:4px; white-space:pre-line;}
+.prog{background:var(--accent-soft); color:#5A4012; border-radius:8px; padding:9px 11px; font-size:12.5px; line-height:1.5; margin-top:12px;}
+.field label{display:block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--ink-soft); margin-bottom:4px;}
+.field{margin-bottom:12px;}
+.field input[type=text],.field input[type=search],.field input[type=password],.field input[type=tel]{width:100%; padding:11px; border:1px solid var(--line); border-radius:8px; font-size:14px; background:#FBFCFB; font-family:'Inter',sans-serif;}
+.res{margin-top:6px;}
+.res button{display:block; width:100%; text-align:left; background:#fff; border:1px solid var(--line); border-radius:8px; padding:10px 11px; margin-bottom:6px; font-size:13.5px; cursor:pointer; font-family:'Inter',sans-serif;}
+.res button:hover{background:var(--ok-bg);}
+.res .vacio{font-size:12.5px; color:var(--ink-soft); padding:6px 2px;}
+.persona{background:var(--ok-bg); border:1px solid #BFE0CC; border-radius:8px; padding:10px 12px; font-size:14px; font-weight:600; display:flex; justify-content:space-between; gap:10px; align-items:center;}
+.persona button{background:none; border:none; color:var(--primary-dark); font-weight:700; font-size:12px; cursor:pointer; text-decoration:underline;}
+.pad-wrap{border:1.5px dashed var(--primary); border-radius:10px; background:#fff; position:relative;}
+.pad-wrap canvas{display:block; width:100%; height:170px; touch-action:none; cursor:crosshair; border-radius:10px;}
+.pad-hint{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#9AA9A3; font-size:13px; pointer-events:none;}
+.pad-wrap.firmado .pad-hint{display:none;}
+.pad-tools{display:flex; justify-content:space-between; align-items:center; margin-top:6px; font-size:12px; color:var(--ink-soft);}
+.btn-link{background:none; border:none; color:var(--bad); font-weight:700; font-size:12.5px; cursor:pointer; text-decoration:underline; font-family:'Inter',sans-serif;}
+.chk{display:flex; gap:9px; align-items:flex-start; font-size:13px; line-height:1.5; margin:10px 0; color:var(--ink);}
+.chk input{margin-top:3px; flex:0 0 auto; width:17px; height:17px;}
+.btn{width:100%; border:none; border-radius:10px; padding:14px 16px; font-weight:700; font-size:14.5px; cursor:pointer; background:var(--primary); color:#fff; font-family:'Inter',sans-serif; margin-top:6px;}
+.btn:disabled{opacity:.5; cursor:not-allowed;}
+.msg{border-radius:8px; padding:10px 12px; font-size:13px; line-height:1.5; margin-top:10px;}
+.msg.err{background:var(--bad-bg); color:#7C2D1F;}
+.msg.ok{background:var(--ok-bg); color:#1D5A39;}
+.msg.info{background:var(--accent-soft); color:#5A4012;}
+.constancia{text-align:center;}
+.constancia .big{font-family:'Fraunces',serif; font-size:20px; color:var(--ok); margin:4px 0;}
+.constancia .cod{font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:600; background:#F3F6F4; border:1px solid var(--line); border-radius:8px; padding:8px; margin:10px 0;}
+.hidden{display:none !important;}
+footer{text-align:center; font-size:11.5px; color:var(--ink-soft); margin-top:24px; line-height:1.6;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="hero">
+    <p class="eyebrow" id="eyebrow">Asociación Alameda Lima Sur</p>
+    <h1 id="heroTitulo">Adhesión a convocatoria</h1>
+    <p>Asociación de Propietarios y Residentes de la Urbanización Alameda Lima-Sur</p>
+  </div>
+
+  <div id="cargando" class="card"><p class="sub" style="margin:0">Cargando convocatoria…</p></div>
+  <div id="error" class="card hidden"><div class="msg err" id="errorTxt"></div></div>
+
+  <div id="contenido" class="hidden">
+    <div class="card conv" id="conv"></div>
+    <div class="card" id="cardFirma">
+      <h2>Suscribir esta convocatoria</h2>
+      <p class="sub">Solo pueden firmar los asociados empadronados. Busque su apellido, confirme su DNI y firme con el dedo o el mouse.</p>
+
+      <div id="paso1">
+        <div class="field">
+          <label for="buscar">1. Busque su apellido</label>
+          <input type="search" id="buscar" placeholder="Ej. Lártiga" autocomplete="off">
+          <div class="res" id="res"></div>
+        </div>
+      </div>
+
+      <div id="paso2" class="hidden">
+        <div class="field">
+          <label>Asociado</label>
+          <div class="persona"><span id="personaTxt"></span><button type="button" id="cambiar">Cambiar</button></div>
+        </div>
+        <div class="field">
+          <label for="dni">2. Confirme su DNI</label>
+          <input type="tel" id="dni" inputmode="numeric" maxlength="8" placeholder="8 dígitos" autocomplete="off">
+        </div>
+        <div class="field">
+          <label>3. Su firma</label>
+          <div class="pad-wrap" id="padWrap">
+            <canvas id="pad" width="600" height="240"></canvas>
+            <div class="pad-hint">Firme aquí</div>
+          </div>
+          <div class="pad-tools"><span>Puede borrar y volver a firmar antes de enviar.</span><button type="button" class="btn-link" id="borrar">Borrar y volver a firmar</button></div>
+        </div>
+        <label class="chk"><input type="checkbox" id="acepto"><span id="aceptoTxt">Declaro que soy asociado empadronado y suscribo esta convocatoria.</span></label>
+        <label class="chk"><input type="checkbox" id="manus"><span>Me comprometo a ratificar mi firma en manuscrito en la lista impresa que se presentará con esta convocatoria.</span></label>
+        <button type="button" class="btn" id="enviar">Firmar y enviar</button>
+        <div id="aviso"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="listo" class="card constancia hidden">
+    <div class="big">✔ Firma registrada</div>
+    <p class="sub" id="listoTxt"></p>
+    <div class="cod" id="listoCod"></div>
+    <div class="msg info">Guarde este código. Recuerde firmar a mano la lista impresa: la firma digital es un respaldo y la lista impresa es la que se presenta.</div>
+  </div>
+
+  <footer>Sus datos y su firma se guardan en una hoja privada de la Asociación y no se muestran en esta página.<br>Ley N° 29733 · Contacto: WhatsApp 987714309 · sosalamedalimasur@gmail.com</footer>
+</div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbzYaDOIVyaN2KJ8bewTnHYmwYWkvOOnxwz6Wq-1lq9wzjquz-1UahDVokHC8-8DOl-xNw/exec";
+const $ = id => document.getElementById(id);
+const MENSAJES = {
+  no_coincide:"El DNI no corresponde a la persona seleccionada. Revise el número.",
+  bloqueado:"Demasiados intentos con ese DNI. Comuníquese con el Consejo por WhatsApp (987714309).",
+  ya_firmo:"Esta persona ya firmó esta convocatoria.",
+  cerrada:"Esta convocatoria ya está cerrada y no recibe más firmas.",
+  limite:"Hay muchas consultas en este momento. Espere un minuto e intente de nuevo.",
+  firma:"La firma no es válida. Bórrela y vuelva a firmar.",
+  acepto:"Debe marcar las dos casillas de conformidad.",
+  datos:"Revise los datos ingresados.",
+  no_existe:"No encontramos esta convocatoria. Verifique el enlace que recibió.",
+  codigo:"El enlace no tiene un código de convocatoria válido.",
+  servidor:"Hubo un problema en el servidor. Intente de nuevo en unos minutos."
+};
+function msg(e){ return MENSAJES[e] || MENSAJES.servidor; }
+async function apiGet(params){
+  const r = await fetch(API_URL + "?" + new URLSearchParams(params).toString());
+  return r.json();
+}
+async function apiPost(obj){
+  const r = await fetch(API_URL, { method:"POST", headers:{ "Content-Type":"text/plain;charset=utf-8" }, body: JSON.stringify(obj) });
+  return r.json();
+}
+function el(tag, cls, txt){ const e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e; }
+
+let CODIGO = "", elegido = null, hayTrazo = false;
+
+function mostrarError(t){ $("cargando").classList.add("hidden"); $("error").classList.remove("hidden"); $("errorTxt").textContent = t; }
+
+function pintarConvocatoria(c){
+  const box = $("conv"); box.innerHTML = "";
+  let lista = null, tipoLista = "";
+  c.bloques.forEach(b=>{
+    if(b.t!=="ITEM" && b.t!=="VINETA") lista = null;
+    if(b.t==="TITULO"){ box.appendChild(el("h3","t",b.x)); }
+    else if(b.t==="SUBTITULO"){ box.appendChild(el("h4","st",b.x)); }
+    else if(b.t==="ENCABEZADO"){ box.appendChild(el("h5","en",b.x)); }
+    else if(b.t==="ITEM" || b.t==="VINETA"){
+      const want = b.t==="ITEM" ? "ol" : "ul";
+      if(!lista || tipoLista!==want){ lista = el(want); tipoLista = want; box.appendChild(lista); }
+      lista.appendChild(el("li",null,b.x));
+    } else { box.appendChild(el("p",null,b.x)); }
+  });
+  const pre = c.codigo.split(/\d/)[0];
+  const quien = pre==="CD" ? "Convoca el Consejo Directivo" : (pre==="APRUALS" ? "Convocatoria por iniciativa de asociados (10%)" : "Convocatoria");
+  $("eyebrow").textContent = c.codigo + " · " + quien;
+  document.title = c.codigo + " — Adhesión a convocatoria";
+  actualizarProgreso(c.firmas, c.minimo, c.total);
+  if(c.estado==="CERRADA"){ $("cardFirma").classList.add("hidden"); }
+}
+function actualizarProgreso(f, min, total){
+  let p = $("prog"); if(!p){ p = el("div","prog"); p.id="prog"; $("conv").appendChild(p); }
+  p.textContent = "Firmas registradas: " + f + ". Referencia del 10% de los " + total + " asociados empadronados: " + min + " firmas.";
+}
+
+/* ---------- búsqueda ---------- */
+let tBuscar = null;
+$("buscar").addEventListener("input", ()=>{
+  clearTimeout(tBuscar);
+  const q = $("buscar").value.trim(), res = $("res");
+  if(q.length < 3){ res.innerHTML = ""; return; }
+  tBuscar = setTimeout(async ()=>{
+    try{
+      const r = await apiGet({accion:"buscar", q});
+      res.innerHTML = "";
+      if(!r.ok){ res.appendChild(el("div","vacio",msg(r.error))); return; }
+      if(!r.resultados.length){ res.appendChild(el("div","vacio","No hay coincidencias en el padrón. Si es asociado, comuníquese con el Consejo.")); return; }
+      r.resultados.forEach(p=>{
+        const b = el("button",null,p.apellidos + ", " + p.nombres); b.type="button";
+        b.addEventListener("click", ()=>elegir(p));
+        res.appendChild(b);
+      });
+    }catch(e){ res.innerHTML=""; res.appendChild(el("div","vacio",msg("servidor"))); }
+  }, 350);
+});
+function elegir(p){
+  elegido = p;
+  $("personaTxt").textContent = p.nombres + " " + p.apellidos;
+  $("paso1").classList.add("hidden"); $("paso2").classList.remove("hidden");
+  $("dni").value = ""; limpiarFirma(); $("aviso").innerHTML = "";
+}
+$("cambiar").addEventListener("click", ()=>{
+  elegido = null; $("paso2").classList.add("hidden"); $("paso1").classList.remove("hidden");
+  $("buscar").value=""; $("res").innerHTML="";
+});
+
+/* ---------- firma ---------- */
+const cv = $("pad"), cx = cv.getContext && cv.getContext("2d");
+let dibujando = false, puntos = 0;
+function iniciarLienzo(){
+  if(!cx) return;
+  cx.fillStyle = "#FFFFFF"; cx.fillRect(0,0,cv.width,cv.height);
+  cx.strokeStyle = "#111"; cx.lineWidth = 3; cx.lineCap = "round"; cx.lineJoin = "round";
+}
+function pos(e){
+  const r = cv.getBoundingClientRect();
+  return { x:(e.clientX - r.left) * cv.width / r.width, y:(e.clientY - r.top) * cv.height / r.height };
+}
+cv.addEventListener("pointerdown", e=>{
+  e.preventDefault(); dibujando = true;
+  try{ cv.setPointerCapture(e.pointerId); }catch(_){}
+  const p = pos(e); cx.beginPath(); cx.moveTo(p.x,p.y); cx.lineTo(p.x+0.1,p.y+0.1); cx.stroke();
+});
+cv.addEventListener("pointermove", e=>{
+  if(!dibujando) return; e.preventDefault();
+  const p = pos(e); cx.lineTo(p.x,p.y); cx.stroke(); cx.beginPath(); cx.moveTo(p.x,p.y);
+  puntos++; if(puntos>15){ hayTrazo = true; $("padWrap").classList.add("firmado"); }
+});
+["pointerup","pointercancel","pointerleave"].forEach(ev=>cv.addEventListener(ev, ()=>{ dibujando=false; }));
+function limpiarFirma(){ puntos=0; hayTrazo=false; $("padWrap").classList.remove("firmado"); iniciarLienzo(); }
+$("borrar").addEventListener("click", limpiarFirma);
+iniciarLienzo();
+
+/* ---------- enviar ---------- */
+function aviso(cls, t){ const a=$("aviso"); a.innerHTML=""; a.appendChild(el("div","msg "+cls,t)); }
+$("enviar").addEventListener("click", async ()=>{
+  if(!elegido) return;
+  const dni = $("dni").value.replace(/\D/g,"");
+  if(dni.length<7 || dni.length>8) return aviso("err","Ingrese su DNI de 8 dígitos.");
+  if(!hayTrazo) return aviso("err","Falta su firma. Fírme en el recuadro.");
+  if(!$("acepto").checked || !$("manus").checked) return aviso("err",MENSAJES.acepto);
+  $("enviar").disabled = true; aviso("info","Enviando…");
+  try{
+    const r = await apiPost({ accion:"firmar", c:CODIGO, id:elegido.id, dni, firma:cv.toDataURL("image/png"), manuscrito:true, acepto:true });
+    if(r.ok){
+      $("contenido").classList.add("hidden");
+      $("listo").classList.remove("hidden");
+      $("listoTxt").textContent = elegido.nombres + " " + elegido.apellidos + " · N° de orden " + r.orden + " · " + r.fecha + " " + r.hora + " (hora de Lima)";
+      $("listoCod").textContent = r.constancia;
+      window.scrollTo(0,0);
+    } else if(r.error==="ya_firmo"){
+      aviso("err", msg("ya_firmo") + (r.fecha ? " Registrada el " + r.fecha + " a las " + r.hora + " (N° " + r.orden + ")." : ""));
+      $("enviar").disabled = false;
+    } else { aviso("err", msg(r.error)); $("enviar").disabled = false; }
+  }catch(e){ aviso("err", msg("servidor")); $("enviar").disabled = false; }
+});
+
+/* ---------- inicio ---------- */
+(async function(){
+  CODIGO = (new URLSearchParams(location.search).get("c") || "").trim().toUpperCase();
+  if(!/^[A-Z0-9_-]{3,40}$/.test(CODIGO)) return mostrarError(msg("codigo"));
+  try{
+    const c = await apiGet({accion:"convocatoria", c:CODIGO});
+    if(!c.ok) return mostrarError(msg(c.error));
+    pintarConvocatoria(c);
+    $("cargando").classList.add("hidden"); $("contenido").classList.remove("hidden");
+  }catch(e){ mostrarError(msg("servidor")); }
+})();
+</script>
+</body>
+</html>
