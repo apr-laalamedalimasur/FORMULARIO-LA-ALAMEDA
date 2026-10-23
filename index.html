@@ -74,6 +74,13 @@ body{margin:0; background:var(--bg); color:var(--ink); font-family:'Inter',sans-
 .policy p{margin:6px 0; color:var(--ink-soft); line-height:1.5;}
 .policy strong{color:var(--ink);}
 
+
+.buscador-res{margin-top:6px; border:1px solid var(--line); border-radius:8px; background:#fff; overflow:hidden;}
+.buscador-res button{display:block; width:100%; text-align:left; border:none; border-bottom:1px solid var(--line-soft); background:#fff; padding:10px 12px; font-family:'Inter',sans-serif; font-size:13.5px; color:var(--ink); cursor:pointer;}
+.buscador-res button:last-child{border-bottom:none;}
+.buscador-res button:hover{background:var(--ok-bg);}
+.buscador-res .vacio{padding:10px 12px; font-size:12.5px; color:var(--ink-soft);}
+
 footer{text-align:center; color:var(--ink-soft); font-size:11px; margin-top:20px; font-family:'JetBrains Mono',monospace;}
 </style>
 </head>
@@ -95,8 +102,9 @@ footer{text-align:center; color:var(--ink-soft); font-size:11px; margin-top:20px
   <div class="section active" id="sec-datos">
     <div class="card">
       <h2>Verifica si estás empadronado</h2>
-      <p class="sub">Escribe tu DNI para verificar si ya estás registrado en el padrón de asociados. Si lo estás, revisa/actualiza tus datos aquí. Si no apareces, ve a "Actualiza tus datos padrón" para registrarte.</p>
+      <p class="sub">Busca tu apellido o escribe tu DNI para verificar si ya estás registrado en el padrón de asociados. Si lo estás, revisa/actualiza tus datos aquí. Si no apareces, ve a "Actualiza tus datos padrón" para registrarte.</p>
       <div class="grid2">
+        <div class="field full"><label>Buscar por apellidos o nombres (aunque estén incompletos)</label><input type="text" id="as_buscar" placeholder="Ej. Lartiga, o Carlos Mel" autocomplete="off"><div id="as_buscar_res"></div></div>
         <div class="field"><label>DNI</label><input type="text" id="as_dni" inputmode="numeric" maxlength="8"></div>
         <div class="field full" id="as_padron_status" style="margin-top:-8px;"></div>
         <div class="field"><label>Nombres</label><input type="text" id="as_nombres"></div>
@@ -120,7 +128,7 @@ footer{text-align:center; color:var(--ink-soft); font-size:11px; margin-top:20px
         <summary>Política de tratamiento de datos personales (Ley N° 29733)</summary>
         <p><strong>Responsable:</strong> Asociación de Propietarios y Residentes de la Urbanización Alameda Lima Sur.</p>
         <p><strong>Finalidad:</strong> administrar el padrón de asociados, gestionar cuotas, seguridad y comunicación vecinal.</p>
-        <p><strong>Cómo se envían sus datos:</strong> al darle a "Enviar", usted mismo los manda directo por su WhatsApp o correo al Consejo Directivo. Esta página no los guarda ni los transmite a ningún servidor propio.</p>
+        <p><strong>Cómo se envían sus datos:</strong> al darle a "Enviar", usted mismo los manda por su WhatsApp o correo al Consejo Directivo. Además, la información enviada se registra en una hoja de cálculo de uso interno de la asociación, para fines de administración del padrón. La consulta del padrón desde esta página no muestra DNI ni datos de contacto de otras personas.</p>
         <p><strong>Conservación:</strong> mientras dure su condición de asociado o residente, o hasta que solicite su eliminación.</p>
         <p><strong>Sus derechos:</strong> puede pedir acceso, rectificación, cancelación u oposición al uso de sus datos (derechos ARCO) escribiendo al mismo WhatsApp o correo de contacto de la asociación.</p>
         <p>No se comparten con terceros ajenos a la asociación.</p>
@@ -246,7 +254,7 @@ footer{text-align:center; color:var(--ink-soft); font-size:11px; margin-top:20px
         <summary>Política de tratamiento de datos personales (Ley N° 29733)</summary>
         <p><strong>Responsable:</strong> Asociación de Propietarios y Residentes de la Urbanización Alameda Lima Sur.</p>
         <p><strong>Finalidad:</strong> elaborar el censo de predios y asociados, gestionar cuotas, seguridad y comunicación vecinal.</p>
-        <p><strong>Cómo se envían sus datos:</strong> al darle a "Enviar", usted mismo los manda directo por su WhatsApp o correo al Consejo Directivo. Esta página no los guarda ni los transmite a ningún servidor propio.</p>
+        <p><strong>Cómo se envían sus datos:</strong> al darle a "Enviar", usted mismo los manda por su WhatsApp o correo al Consejo Directivo. Además, la información enviada se registra en una hoja de cálculo de uso interno de la asociación, para fines de administración del padrón. La consulta del padrón desde esta página no muestra DNI ni datos de contacto de otras personas.</p>
         <p><strong>Conservación:</strong> mientras dure su condición de asociado o residente, o hasta que solicite su eliminación.</p>
         <p><strong>Sus derechos:</strong> puede pedir acceso, rectificación, cancelación u oposición al uso de sus datos (derechos ARCO) escribiendo al mismo WhatsApp o correo de contacto de la asociación.</p>
         <p>No se comparten con terceros ajenos a la asociación.</p>
@@ -271,7 +279,6 @@ footer{text-align:center; color:var(--ink-soft); font-size:11px; margin-top:20px
 </div>
 
 <script>
-const PADRON = [{"dni": "09873784", "apellidos": "ALCEDO BUSTAMANTE", "nombres": "JUAN CARLOS"}, {"dni": "46181633", "apellidos": "ALDAUF ABANTO", "nombres": "MARCO ANTONIO"}, {"dni": "10638624", "apellidos": "ALDUNATE VILLANO", "nombres": "FILOMENA ADELA"}, {"dni": "10036628", "apellidos": "ALEGRIA RIOS", "nombres": "LIZARDO EUGENIO"}, {"dni": "06139856", "apellidos": "ALIAGA ALIAGA", "nombres": "GILBERT PERCY"}, {"dni": "22090634", "apellidos": "ARBIETO CAMPOS", "nombres": "ARNALDO IVAN"}, {"dni": "09896361", "apellidos": "ARQUINIGO HUERTA", "nombres": "LUIS ANTONIO"}, {"dni": "42960260", "apellidos": "ARQUIÑEGO BENDITA", "nombres": "JASMIN JANET"}, {"dni": "08662969", "apellidos": "BENDEZU DOMINGUEZ", "nombres": "MICHELL ANGELLA"}, {"dni": "74944058", "apellidos": "BERMUDEZ LOPEZ", "nombres": "YZAVHO SASHA"}, {"dni": "08121022", "apellidos": "CABRERA CRUZADO", "nombres": "JUAN GILBERTO"}, {"dni": "74377185", "apellidos": "CABRERA SASAKI", "nombres": "SAORI"}, {"dni": "09688066", "apellidos": "CAMASITA VARGAS", "nombres": "ARTEMIO ORLANDO"}, {"dni": "08038956", "apellidos": "CARRANZA RENGIFO", "nombres": "OMAR"}, {"dni": "20112511", "apellidos": "CERDA RAMIREZ", "nombres": "FLORMIRA"}, {"dni": "40564784", "apellidos": "CERECEDA MANRIQUE", "nombres": "AUGUSTIN FERNANDO"}, {"dni": "45493272", "apellidos": "CHACON OLIVA", "nombres": "MARCOS ISAIAS"}, {"dni": "40374711", "apellidos": "CHAVEZ HERNANDEZ", "nombres": "AGUSTIN JOHN"}, {"dni": "40943997", "apellidos": "CHAVEZ HERNANDEZ", "nombres": "RICARDO ANTONIO"}, {"dni": "43455891", "apellidos": "CHAVEZ ORTIZ", "nombres": "MIRCO SAUL"}, {"dni": "08123578", "apellidos": "CHAVEZ PONCE", "nombres": "NANCY ROSARIO"}, {"dni": "08570117", "apellidos": "CHI YONG CASTILLO", "nombres": "JAVIER ENRIQUE"}, {"dni": "06052583", "apellidos": "CHIANG IJHII", "nombres": "JORGE DANIEL"}, {"dni": "47109621", "apellidos": "CHINGO TORRES", "nombres": "MERY"}, {"dni": "10093426", "apellidos": "CHOQUE CHAVEZ", "nombres": "JOSE LUIS"}, {"dni": "40735381", "apellidos": "CHUQUILLANQUI JIMENEZ", "nombres": "ROCIO LIZ"}, {"dni": "40536821", "apellidos": "CONTRERAS PEREZ", "nombres": "FELIPE MARTIN"}, {"dni": "10009531", "apellidos": "CORRALES MORMOMUY", "nombres": "GLORIA"}, {"dni": "43865295", "apellidos": "COTRINA TOCAS", "nombres": "MARIA MARUJA"}, {"dni": "25811108", "apellidos": "CURO GONZALES", "nombres": "FANIA AGUSTINA"}, {"dni": "43374114", "apellidos": "CURTI QUISPE", "nombres": "ROSARIO"}, {"dni": "41209087", "apellidos": "DA CRUZ AVALOS", "nombres": "ANA MARIA"}, {"dni": "42219912", "apellidos": "DA CRUZ AVALOS", "nombres": "IRMA ZORAIDA"}, {"dni": "06801838", "apellidos": "DELGADO FLORES", "nombres": "AQUILES INDOLECIO"}, {"dni": "06800411", "apellidos": "DELGADO MANRIQUE", "nombres": "DONALD AUGUSTO"}, {"dni": "09665179", "apellidos": "DIAZ ARCE", "nombres": "NOEMI DEL PILAR"}, {"dni": "09573336", "apellidos": "DOMINGUEZ GARCIA", "nombres": "BEATRIZ ELENA"}, {"dni": "10628856", "apellidos": "DURAND HUACHO", "nombres": "RINA YSABEL"}, {"dni": "18176315", "apellidos": "ELORREAGA ORBEGOSO", "nombres": "JOSE LUIS"}, {"dni": "40006376", "apellidos": "ESPINOZA VERDE", "nombres": "IGOR ROEL"}, {"dni": "07446361", "apellidos": "FIGUEROA ZAPATA", "nombres": "MARIA TERESA"}, {"dni": "07486618", "apellidos": "FLORES TIPIANI", "nombres": "DOMINGO MARTIN"}, {"dni": "27077268", "apellidos": "GARAY ROJAS", "nombres": "JOSE ALEXANDER"}, {"dni": "06195259", "apellidos": "GARCIA PINILLOS", "nombres": "CARLOS MANUEL"}, {"dni": "43591496", "apellidos": "GUERRA TORRES", "nombres": "ENRIQUE"}, {"dni": "06102936", "apellidos": "GUERRERO HOSORIO", "nombres": "DANTE DANIEL"}, {"dni": "10761071", "apellidos": "HERRERA ANTEZANA", "nombres": "JOEL JESUS"}, {"dni": "09378167", "apellidos": "HUAMANI CARDENAS", "nombres": "ROMAN ODON"}, {"dni": "43258609", "apellidos": "HUAMANI CLARES", "nombres": "GASPAR ARTURO"}, {"dni": "22079624", "apellidos": "HURTADO GARCIA", "nombres": "RICARDO MOISES"}, {"dni": "45265515", "apellidos": "IDROGO GONZALES", "nombres": "YONE MELVA"}, {"dni": "06666272", "apellidos": "JIRALDO GAMARRA", "nombres": "BORIS EDWIN"}, {"dni": "42953642", "apellidos": "JUCAN DIAZ", "nombres": "AINER"}, {"dni": "40771852", "apellidos": "LAGOS CUESTAS", "nombres": "DENICE KARINA"}, {"dni": "10090970", "apellidos": "LARA GELDRES", "nombres": "AURORA ROSARIO"}, {"dni": "44389016", "apellidos": "LAREDO CHAUCA", "nombres": "MERLENE JULIA"}, {"dni": "09353629", "apellidos": "LARTIGA COTERA", "nombres": "LUIS IGNACIO"}, {"dni": "45499415", "apellidos": "LAYA SOLANO", "nombres": "KATIA ESTHER"}, {"dni": "09452719", "apellidos": "LAYA SOLANO", "nombres": "MOISES MARTIN"}, {"dni": "07947351", "apellidos": "LENGUA CALLE", "nombres": "CARLOS IGNACIO"}, {"dni": "02578799", "apellidos": "LINARES CALDERON", "nombres": "ARTURO RAUL"}, {"dni": "10712861", "apellidos": "LLANOS ITURRIZAGA", "nombres": "RAUL ANDRE"}, {"dni": "10607659", "apellidos": "MANIÑAS AMESQUITA", "nombres": "JOSE"}, {"dni": "10120974", "apellidos": "MARTINEZ TELLO", "nombres": "ARMANDO JAVIER"}, {"dni": "32909376", "apellidos": "MEDINA SALVADOR", "nombres": "PEGUI"}, {"dni": "40166027", "apellidos": "MELGAR EGOAVIL", "nombres": "JOSE MANUEL"}, {"dni": "08072579", "apellidos": "MELGAR TIPISMANA", "nombres": "CARLOS ANTONIO"}, {"dni": "40435019", "apellidos": "MENDOZA DIAZ", "nombres": "GOUDI CRISTELL"}, {"dni": "32037431", "apellidos": "MENDRANO VILLANUEVA", "nombres": "MERI ZENAIDA"}, {"dni": "07537695", "apellidos": "MENENDEZ CASTILLO", "nombres": "RAMON FRANCISCO"}, {"dni": "09715716", "apellidos": "MOGROVEJO MEDINA", "nombres": "JULIO FRANCISCO"}, {"dni": "07716444", "apellidos": "MOLINA CARBAJAL", "nombres": "SIDNEY PAULINO"}, {"dni": "40628000", "apellidos": "MONTUFAR MEDINA", "nombres": "YIPSA"}, {"dni": "40219666", "apellidos": "MORIN NINA", "nombres": "ALEXANDER MOISES"}, {"dni": "09107787", "apellidos": "NALVARTE GIL", "nombres": "JOSE LUIS"}, {"dni": "10701261", "apellidos": "NEYRA DEL CARPIO", "nombres": "JHOE"}, {"dni": "42054053", "apellidos": "NOBLECILLA MIRANO", "nombres": "LEONARDO ERICK"}, {"dni": "46934895", "apellidos": "OCUPA CRUZ", "nombres": "MAYTHE"}, {"dni": "10841219", "apellidos": "ORBEGOSO VILCA", "nombres": "ROGER ALBERTO"}, {"dni": "72206838", "apellidos": "ORMEÑO ROMERO", "nombres": "CARLOS MANUEL ALAN"}, {"dni": "07926310", "apellidos": "PACHERRE CASTILLO", "nombres": "GERMAN MARTIN"}, {"dni": "10620355", "apellidos": "PALOMAREZ SARTOR", "nombres": "JANET NANOY"}, {"dni": "46488179", "apellidos": "PASTOR WIDDUP", "nombres": "MILUDY KATHERINE"}, {"dni": "07940013", "apellidos": "PATIÑO ZEGARRA", "nombres": "JUSTO ARMANDO"}, {"dni": "45880266", "apellidos": "PAZOS CASTRO", "nombres": "JUAN MANUEL"}, {"dni": "22303074", "apellidos": "PEBES MARCACOZCO", "nombres": "JUAN"}, {"dni": "08404425", "apellidos": "PEÑA CORDOVA", "nombres": "MARISABEL"}, {"dni": "25681905", "apellidos": "PERALTA GUERRERO", "nombres": "ELIZABETH GIANINA"}, {"dni": "47532199", "apellidos": "PEREZ VENTURIZO", "nombres": "LEYLA KARINA"}, {"dni": "32950345", "apellidos": "PIZARRO SANCHEZ", "nombres": "LUIS EMILIO"}, {"dni": "47268301", "apellidos": "PORTALES ARBUQUEQUE", "nombres": "MARIA SOLANCH"}, {"dni": "08716822", "apellidos": "PRADO BOCANGEL", "nombres": "ROXANA"}, {"dni": "06780430", "apellidos": "PRETEL PLASENCIA", "nombres": "SUSANA ELIZABETH"}, {"dni": "41297845", "apellidos": "PUENTE CONTRERAS", "nombres": "MYDORY MABEL"}, {"dni": "07495372", "apellidos": "PUENTE PUENTE", "nombres": "MARIA ELENA"}, {"dni": "08448343", "apellidos": "QUIROZ CIEZA", "nombres": "GUILLERMO"}, {"dni": "40614259", "apellidos": "QUISPE MOSCO", "nombres": "SONIA ISABEL"}, {"dni": "73797130", "apellidos": "QUISPE ROJAS", "nombres": "ROSA YASMIRA"}, {"dni": "80114899", "apellidos": "QUISPE VILLAGARAY", "nombres": "OSCAR ANTONIO"}, {"dni": "10007031", "apellidos": "RECARTE PERALES", "nombres": "SERGIO RICARDO"}, {"dni": "72555493", "apellidos": "REYES FUGUEROA", "nombres": "DANIEL ENRIQUE"}, {"dni": "47936177", "apellidos": "RODRIGUEZ PEREZ", "nombres": "LUIS ALBERTO"}, {"dni": "06666012", "apellidos": "ROJAS VELEZ", "nombres": "EMMA YRIS"}, {"dni": "40443125", "apellidos": "ROMERO SANCHEZ", "nombres": "VICTOR CARLOS"}, {"dni": "06696136", "apellidos": "RONDON NUÑEZ", "nombres": "RICARDO"}, {"dni": "08731096", "apellidos": "SALAZAR LAOS", "nombres": "JULIO CESAR"}, {"dni": "72707762", "apellidos": "SANCHEZ CHAVEZ", "nombres": "LUIS ENRIQUE"}, {"dni": "70465049", "apellidos": "SANCHEZ HERRERA", "nombres": "HENRY JUNIOR"}, {"dni": "40945960", "apellidos": "SANCHEZ MAQUIÑA", "nombres": "MANUEL ALEJANDRO"}, {"dni": "43618334", "apellidos": "SANTIAGO PEREZ", "nombres": "JOEL IVAN"}, {"dni": "07802984", "apellidos": "SOLARI PALET", "nombres": "CESAR FORTUNATO"}, {"dni": "40736188", "apellidos": "SOLORZANO CASTILLO", "nombres": "EDWIN CELSO"}, {"dni": "10091419", "apellidos": "SOTOMAYOR SANTOS", "nombres": "JORGE LUIS"}, {"dni": "40121439", "apellidos": "SUAREZ SUAREZ", "nombres": "ALAN PAUL"}, {"dni": "80538067", "apellidos": "SUAREZ SUAREZ", "nombres": "JORGE LUIS"}, {"dni": "10438279", "apellidos": "TINEO PILLACA", "nombres": "HECTOR ALBERTO"}, {"dni": "10738694", "apellidos": "TRUJILLO ORTEGA", "nombres": "GLENDA RITA"}, {"dni": "25745456", "apellidos": "VALENCIA TEJADA", "nombres": "HUGO OSCAR"}, {"dni": "40082765", "apellidos": "VARGAS MEJIA", "nombres": "ALEX ADRIAN"}, {"dni": "07276973", "apellidos": "VASQUEZ VASQUEZ", "nombres": "EDGAR"}, {"dni": "20118250", "apellidos": "YUNKOR ROMERO", "nombres": "YURELO"}, {"dni": "90881411", "apellidos": "ZAPATA GONSALEZ", "nombres": "FIORELLA"}, {"dni": "07736682", "apellidos": "ZARATE OLIVARI", "nombres": "VICTOR ADRIAN"}, {"dni": "06040557", "apellidos": "ZEGARRA MONTOYA", "nombres": "ALFREDO"}];
 const CONTACTO_TEL = "987714309";
 const CONTACTO_EMAIL = "sosalamedalimasur@gmail.com";
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbymkVA2Sm_w510seLTaqNnDs2cdDmm6pngfI5WP7K3wBMwWcy2IqC63YX5X80fs3CCv/exec";
@@ -279,20 +286,80 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbymkVA2Sm_w510s
 function uid(p){ return p+"_"+Math.random().toString(36).slice(2,8); }
 function val(id){ const el=document.getElementById(id); return el?el.value.trim():""; }
 
-function verificarDniPadron(){
+const PADRON_API_URL = "https://script.google.com/macros/s/AKfycbzYaDOIVyaN2KJ8bewTnHYmwYWkvOOnxwz6Wq-1lq9wzjquz-1UahDVokHC8-8DOl-xNw/exec";
+let PADRON_SELECCIONADO = null;
+let _tBuscar = null;
+
+async function apiPadron(params){
+  if(!PADRON_API_URL || PADRON_API_URL.indexOf("__") === 0) throw new Error("sin-api");
+  const r = await fetch(PADRON_API_URL + "?" + new URLSearchParams(params).toString());
+  return await r.json();
+}
+function esc(t){ return String(t).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function msgConsulta(box, r){
+  box.innerHTML = '<div class="msg err">' + (r && r.error === "bloqueado"
+    ? 'Demasiados intentos con este nombre. Inténtalo más tarde o completa tus datos igual.'
+    : 'No pudimos consultar el padrón en este momento. Puedes completar tus datos igual y enviarlos.') + '</div>';
+}
+
+function buscarPadron(){
+  clearTimeout(_tBuscar);
+  const q = document.getElementById("as_buscar").value.trim();
+  const box = document.getElementById("as_buscar_res");
+  if(q.length < 3){ box.innerHTML = ""; return; }
+  _tBuscar = setTimeout(async () => {
+    try{
+      const r = await apiPadron({accion:"buscar", q:q});
+      if(!r.ok) throw new Error("api");
+      if(!r.resultados.length){
+        box.innerHTML = '<div class="buscador-res"><div class="vacio">No hay coincidencias. Prueba con menos letras o solo el apellido. Si eres nuevo, usa "Actualiza tus datos padrón".</div></div>';
+        return;
+      }
+      box.innerHTML = '<div class="buscador-res">' + r.resultados.map(p =>
+        '<button type="button" data-id="'+p.id+'">'+esc(p.apellidos)+', '+esc(p.nombres)+'</button>').join("") + '</div>';
+      box.querySelectorAll("button").forEach((b, i) => b.addEventListener("click", () => elegirPadron(r.resultados[i])));
+    }catch(e){
+      box.innerHTML = '<div class="buscador-res"><div class="vacio">No pudimos consultar el padrón ahora. Puedes completar tus datos igual.</div></div>';
+    }
+  }, 350);
+}
+function elegirPadron(p){
+  PADRON_SELECCIONADO = p;
+  document.getElementById("as_nombres").value = p.nombres;
+  document.getElementById("as_apellidos").value = p.apellidos;
+  document.getElementById("as_dni").value = "";
+  document.getElementById("as_buscar_res").innerHTML = "";
+  document.getElementById("as_buscar").value = p.apellidos + ", " + p.nombres;
+  document.getElementById("as_padron_status").innerHTML = '<div class="msg ok">Seleccionaste <strong>'+esc(p.apellidos)+', '+esc(p.nombres)+'</strong>. Escribe tu DNI para confirmar que eres tú y completa el resto de tus datos.</div>';
+  document.getElementById("as_dni").focus();
+}
+
+async function verificarDniPadron(){
   const dniEl = document.getElementById("as_dni");
   const box = document.getElementById("as_padron_status");
   if(!dniEl || !box) return;
   const dni = dniEl.value.trim();
-  if(dni.length < 8){ box.innerHTML=""; return; }
-  const encontrado = PADRON.find(p => p.dni === dni.padStart(8,"0"));
-  if(encontrado){
-    box.innerHTML = '<div class="msg ok">✔ Estás registrado en el padrón como <strong>'+encontrado.apellidos+', '+encontrado.nombres+'</strong>. Verifica que tus datos estén correctos y actualízalos si hace falta.</div>';
-    if(!val("as_nombres")) document.getElementById("as_nombres").value = encontrado.nombres;
-    if(!val("as_apellidos")) document.getElementById("as_apellidos").value = encontrado.apellidos;
-  } else {
-    box.innerHTML = '<div class="msg err">No encontramos ese DNI en el padrón de asociados. Si eres nuevo o el dato está mal registrado, completa tus datos igual y usa "Actualiza tus datos padrón" para el registro completo.</div>';
-  }
+  if(dni.length < 8){ if(!PADRON_SELECCIONADO) box.innerHTML = ""; return; }
+  try{
+    if(PADRON_SELECCIONADO){
+      const r = await apiPadron({accion:"confirmar", id:PADRON_SELECCIONADO.id, dni:dni});
+      if(r.ok){
+        box.innerHTML = '<div class="msg ok">✔ Estás registrado en el padrón como <strong>'+esc(PADRON_SELECCIONADO.apellidos)+', '+esc(PADRON_SELECCIONADO.nombres)+'</strong>. Verifica que tus datos estén correctos y actualízalos si hace falta.</div>';
+      } else if(r.error === "no_coincide"){
+        box.innerHTML = '<div class="msg err">Ese DNI no corresponde a la persona que seleccionaste. Verifica tu DNI o vuelve a buscar tu nombre.</div>';
+      } else { msgConsulta(box, r); }
+      return;
+    }
+    const r = await apiPadron({accion:"dni", dni:dni});
+    if(!r.ok){ msgConsulta(box, r); return; }
+    if(r.encontrado){
+      box.innerHTML = '<div class="msg ok">✔ Estás registrado en el padrón como <strong>'+esc(r.apellidos)+', '+esc(r.nombres)+'</strong>. Verifica que tus datos estén correctos y actualízalos si hace falta.</div>';
+      if(!val("as_nombres")) document.getElementById("as_nombres").value = r.nombres;
+      if(!val("as_apellidos")) document.getElementById("as_apellidos").value = r.apellidos;
+    } else {
+      box.innerHTML = '<div class="msg err">No encontramos ese DNI en el padrón de asociados. Si eres nuevo o el dato está mal registrado, completa tus datos igual y usa "Actualiza tus datos padrón" para el registro completo.</div>';
+    }
+  }catch(e){ msgConsulta(box, null); }
 }
 function telefonoWa(tel){
   const d = String(tel||"").replace(/\D/g,"");
@@ -499,6 +566,7 @@ async function guardarEnHoja(payload){
   }
 }
 document.getElementById("sec-datos").addEventListener("input", function(){ datosGuardadoEnHoja = false; setBotonesHabilitados("as", true); });
+document.getElementById("as_buscar").addEventListener("input", buscarPadron);
 document.getElementById("as_dni").addEventListener("input", verificarDniPadron);
 document.getElementById("as_dni").addEventListener("blur", verificarDniPadron);
 document.getElementById("sec-censo").addEventListener("input", function(){ censoGuardadoEnHoja = false; setBotonesHabilitados("cn", true); });
