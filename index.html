@@ -210,7 +210,7 @@ footer{text-align:center; color:var(--ink-soft); font-size:11px; margin-top:20px
         </div>
         <div class="field"><label>N° suministro luz</label><input type="text" id="cn_luz"></div>
         <div class="field"><label>N° suministro agua</label><input type="text" id="cn_agua"></div>
-        <div class="field full"><label>N° de partida SUNARP del predio (opcional, si lo tiene a la mano)</label><input type="text" id="cn_partidaSunarp" placeholder="No indispensable — déjelo en blanco si no lo sabe"></div>
+        <div class="field full"><label>N° de partida SUNARP del predio (obligatorio)</label><input type="text" id="cn_partidaSunarp" placeholder="Ej. P03177714 o 21288748" autocomplete="off"><div style="font-size:12px;color:#5b6b63;margin-top:4px;">Figura en su título de propiedad, contrato o en la copia literal de SUNARP. Si es inquilino o familiar, indique la partida del predio donde vive.</div></div>
         <div class="field full"><label>N° de personas que viven en el predio</label><input type="number" id="cn_personas" min="0"></div>
       </div>
 
@@ -587,7 +587,7 @@ function construirMensajeCenso(){
     "Teléfono: "+val("cn_telefono")+(val("cn_telefonoAlt")?" / "+val("cn_telefonoAlt"):""), "Email: "+val("cn_email"),
     "Etapa/Calle/Mz/Lote: "+val("cn_etapa")+" / "+val("cn_calle")+" / "+val("cn_manzana")+" / "+val("cn_lote"),
     "Condición propiedad: "+val("cn_condicionPropiedad"), "Condición predio: "+val("cn_condicionPredio"),
-    "Luz/Agua: "+val("cn_luz")+" / "+val("cn_agua"), "N° partida SUNARP: "+(val("cn_partidaSunarp")||"no indica"), "N° personas: "+val("cn_personas"),
+    "Luz/Agua: "+val("cn_luz")+" / "+val("cn_agua"), "N° partida SUNARP: "+val("cn_partidaSunarp"), "N° personas: "+val("cn_personas"),
     "Vehículos: "+(veh.length? veh.map(v=>`${v.placa||"s/placa"} ${v.tipo} ${v.marca} ${v.color}`).join("; "):"ninguno"),
     "Mascotas: "+(mas.length? mas.map(m=>`${m.nombre} (${m.raza||"s/raza"}, ${m.sexo||"?"}, ${edadTxt(m.anios,m.meses)}, ester.: ${m.ester||"?"}, ${m.tenencia})`).join("; ") : (val("cn_mascotas")==="Si"?"marcó que sí, sin detalle":"no tiene")),
     "Contactos emergencia: "+(con.length? con.map(c=>`${c.rel||"?"}: ${c.nombre} (${[c.tel1,c.tel2].filter(Boolean).join(" / ")})`).join("; "):"ninguno"),
@@ -689,23 +689,37 @@ async function enviarDatosCorreo(){
   document.getElementById("as_msg").innerHTML='<div class="msg ok">Intentamos abrir tu correo. Si no pasó nada, usa "Copiar mensaje" abajo y pégalo donde puedas enviarlo.'+textoGuardado(estado)+'</div>';
   if(estado==="error") setBotonesHabilitados("as", true);
 }
+function validarCenso(){
+  const box = document.getElementById("cn_msg");
+  if(!val("cn_nombres")||!val("cn_dni")){ box.innerHTML='<div class="msg err">Ingresa al menos tu nombre y tu DNI.</div>'; return false; }
+  if(val("cn_dni").replace(/\D/g,"").length!==8){ box.innerHTML='<div class="msg err">El DNI debe tener 8 dígitos.</div>'; return false; }
+  if(!val("cn_manzana")||!val("cn_lote")){ box.innerHTML='<div class="msg err">Indica la manzana y el lote de tu predio.</div>'; return false; }
+  const partida = val("cn_partidaSunarp").replace(/[\s.-]/g,"").toUpperCase();
+  if(!/^[A-Z]?\d{6,11}$/.test(partida)){
+    box.innerHTML='<div class="msg err">Ingresa el N° de partida SUNARP del predio (por ejemplo P03177714 o 21288748). Es obligatorio para evaluar tu inscripción.</div>';
+    document.getElementById("cn_partidaSunarp").focus(); return false;
+  }
+  document.getElementById("cn_partidaSunarp").value = partida;
+  return true;
+}
+const AVISO_EVALUACION = ' <strong>Tu inscripción quedó registrada y está en evaluación.</strong> El Consejo Directivo verificará tus datos con la partida SUNARP y te confirmará. Mientras tanto aún no figuras en el padrón.';
 async function enviarCensoWhatsapp(){
-  if(!val("cn_nombres")||!val("cn_dni")){ document.getElementById("cn_msg").innerHTML='<div class="msg err">Ingresa al menos tu nombre y tu DNI.</div>'; return; }
+  if(!validarCenso()) return;
   if(!document.getElementById("cn_consiento").checked){ document.getElementById("cn_msg").innerHTML='<div class="msg err">Debes autorizar el uso de tus datos personales.</div>'; return; }
   setBotonesHabilitados("cn", false);
   const estado = await guardarEnHoja(construirPayloadCenso());
   window.open(`https://wa.me/${telefonoWa(CONTACTO_TEL)}?text=${encodeURIComponent(construirMensajeCenso())}`, "_blank");
-  document.getElementById("cn_msg").innerHTML='<div class="msg ok">Intentamos abrir WhatsApp. Si no pasó nada, usa "Copiar mensaje" abajo y pégalo donde puedas enviarlo.'+textoGuardado(estado)+'</div>';
+  document.getElementById("cn_msg").innerHTML='<div class="msg ok">Intentamos abrir WhatsApp. Si no pasó nada, usa "Copiar mensaje" abajo y pégalo donde puedas enviarlo.'+textoGuardado(estado)+(estado==="error"?"":AVISO_EVALUACION)+'</div>';
   if(estado==="error") setBotonesHabilitados("cn", true);
 }
 async function enviarCensoCorreo(){
-  if(!val("cn_nombres")||!val("cn_dni")){ document.getElementById("cn_msg").innerHTML='<div class="msg err">Ingresa al menos tu nombre y tu DNI.</div>'; return; }
+  if(!validarCenso()) return;
   if(!document.getElementById("cn_consiento").checked){ document.getElementById("cn_msg").innerHTML='<div class="msg err">Debes autorizar el uso de tus datos personales.</div>'; return; }
   setBotonesHabilitados("cn", false);
   const estado = await guardarEnHoja(construirPayloadCenso());
   const asunto = "Actualiza tus datos padrón - "+val("cn_nombres")+" "+val("cn_apellidos");
   window.open(`mailto:${encodeURIComponent(CONTACTO_EMAIL)}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(construirMensajeCenso())}`, "_blank");
-  document.getElementById("cn_msg").innerHTML='<div class="msg ok">Intentamos abrir tu correo. Si no pasó nada, usa "Copiar mensaje" abajo y pégalo donde puedas enviarlo.'+textoGuardado(estado)+'</div>';
+  document.getElementById("cn_msg").innerHTML='<div class="msg ok">Intentamos abrir tu correo. Si no pasó nada, usa "Copiar mensaje" abajo y pégalo donde puedas enviarlo.'+textoGuardado(estado)+(estado==="error"?"":AVISO_EVALUACION)+'</div>';
   if(estado==="error") setBotonesHabilitados("cn", true);
 }
 async function copiarAlPortapapeles(texto, msgElId, sufijo){
@@ -725,11 +739,11 @@ async function copiarDatos(){
   if(estado==="error") setBotonesHabilitados("as", true);
 }
 async function copiarCenso(){
-  if(!val("cn_nombres")||!val("cn_dni")){ document.getElementById("cn_msg").innerHTML='<div class="msg err">Ingresa al menos tu nombre y tu DNI.</div>'; return; }
+  if(!validarCenso()) return;
   if(!document.getElementById("cn_consiento").checked){ document.getElementById("cn_msg").innerHTML='<div class="msg err">Debes autorizar el uso de tus datos personales.</div>'; return; }
   setBotonesHabilitados("cn", false);
   const estado = await guardarEnHoja(construirPayloadCenso());
-  await copiarAlPortapapeles(construirMensajeCenso(), "cn_msg", textoGuardado(estado));
+  await copiarAlPortapapeles(construirMensajeCenso(), "cn_msg", textoGuardado(estado)+(estado==="error"?"":AVISO_EVALUACION));
   if(estado==="error") setBotonesHabilitados("cn", true);
 }
 
