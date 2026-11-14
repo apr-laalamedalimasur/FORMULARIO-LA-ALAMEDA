@@ -75,20 +75,44 @@ footer{text-align:center; font-size:11.5px; color:var(--ink-soft); margin-top:24
     <div class="card conv" id="conv"></div>
     <div class="card" id="cardFirma">
       <h2>Suscribir esta convocatoria</h2>
-      <p class="sub">Solo pueden firmar los asociados empadronados. Escriba su DNI, verifique su nombre y firme con el dedo o el mouse.</p>
+      <p class="sub">Los asociados empadronados firman con su DNI, el dígito verificador del DNI y los 4 últimos dígitos del celular que registraron en la Asociación. Los vecinos que no figuran en el padrón pueden respaldar la convocatoria: su firma va en una lista aparte y no se cuenta para el 10 %.</p>
 
       <div id="paso1">
         <div class="field">
-          <label for="dni">1. Escriba su DNI</label>
+          <label for="dni">1. Número de DNI</label>
           <input type="tel" id="dni" inputmode="numeric" maxlength="8" placeholder="8 dígitos" autocomplete="off">
         </div>
-        <button type="button" class="btn" id="verificar">Verificar en el padrón</button>
+        <div class="field">
+          <label for="dv">2. Dígito verificador del DNI</label>
+          <input type="text" id="dv" maxlength="1" placeholder="El número o letra después del guion (12345678-9)" autocomplete="off" style="text-transform:uppercase">
+        </div>
+        <div class="field">
+          <label for="tel4">3. Últimos 4 dígitos de su celular registrado</label>
+          <input type="tel" id="tel4" inputmode="numeric" maxlength="4" placeholder="Solo asociados. Ej.: si es 987 654 321, escriba 4321" autocomplete="off">
+        </div>
+        <button type="button" class="btn" id="verificar">Verificar</button>
         <div id="avisoDni"></div>
+      </div>
+
+      <div id="pasoNA" class="hidden">
+        <div class="msg info">Su DNI no figura en el padrón de asociados. Puede respaldar esta convocatoria como <b>vecino no asociado</b>: su firma va en una lista aparte y no se cuenta para el 10 % de asociados.</div>
+        <div class="field" style="margin-top:12px"><label for="naNombres">Nombres</label><input type="text" id="naNombres" maxlength="60"></div>
+        <div class="field"><label for="naApellidos">Apellidos</label><input type="text" id="naApellidos" maxlength="60"></div>
+        <div style="display:flex; gap:8px">
+          <div class="field" style="flex:1"><label for="naEtapa">Etapa</label><input type="text" id="naEtapa" maxlength="10"></div>
+          <div class="field" style="flex:1"><label for="naMz">Manzana</label><input type="text" id="naMz" maxlength="10"></div>
+          <div class="field" style="flex:1"><label for="naLt">Lote</label><input type="text" id="naLt" maxlength="10"></div>
+        </div>
+        <div class="field"><label for="naTel">Celular</label><input type="tel" id="naTel" inputmode="numeric" maxlength="9" placeholder="9 dígitos"></div>
+        <label class="chk"><input type="checkbox" id="naDatos"><span>Autorizo el tratamiento de mis datos personales por la Asociación, solo para esta convocatoria (Ley N° 29733).</span></label>
+        <button type="button" class="btn" id="naSeguir">Continuar a la firma</button>
+        <button type="button" class="btn-link" id="naVolver" style="margin-top:8px">Volver</button>
+        <div id="avisoNA"></div>
       </div>
 
       <div id="paso2" class="hidden">
         <div class="field">
-          <label>Asociado</label>
+          <label id="personaLbl">Asociado</label>
           <div class="persona"><span id="personaTxt"></span><button type="button" id="cambiar">No soy yo</button></div>
         </div>
         <div class="field">
@@ -122,7 +146,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbzYaDOIVyaN2KJ8bewTnHYm
 const $ = id => document.getElementById(id);
 const MENSAJES = {
   no_coincide:"El DNI no corresponde a esta persona. Pulse \"No soy yo\" y revíselo.",
-  bloqueado:"Demasiados intentos con ese DNI. Comuníquese con el Consejo por WhatsApp (987714309).",
+  bloqueado:"Ese DNI quedó bloqueado por demasiados intentos fallidos. Comuníquese por WhatsApp (987714309) para desbloquearlo.",
   ya_firmo:"Esta persona ya firmó esta convocatoria.",
   cerrada:"Esta convocatoria ya está cerrada y no recibe más firmas.",
   limite:"Hay muchas consultas en este momento. Espere un minuto e intente de nuevo.",
@@ -131,7 +155,9 @@ const MENSAJES = {
   datos:"Revise los datos ingresados.",
   no_existe:"No encontramos esta convocatoria. Verifique el enlace que recibió.",
   codigo:"El enlace no tiene un código de convocatoria válido.",
-  servidor:"Hubo un problema en el servidor. Intente de nuevo en unos minutos."
+  servidor:"Hubo un problema en el servidor. Intente de nuevo en unos minutos.",
+  dv:"El dígito verificador no corresponde a ese DNI. Revíselo en su DNI físico (el número o letra después del guion).",
+  tel:"Los 4 dígitos no coinciden con el celular registrado en la Asociación. Si cambió de número, comuníquese por WhatsApp (987714309)."
 };
 function msg(e){ return MENSAJES[e] || MENSAJES.servidor; }
 async function apiGet(params){
@@ -144,7 +170,7 @@ async function apiPost(obj){
 }
 function el(tag, cls, txt){ const e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e; }
 
-let CODIGO = "", elegido = null, hayTrazo = false;
+let CODIGO = "", elegido = null, hayTrazo = false, credencial = null;
 
 function mostrarError(t){ $("cargando").classList.add("hidden"); $("error").classList.remove("hidden"); $("errorTxt").textContent = t; }
 
@@ -166,68 +192,71 @@ function pintarConvocatoria(c){
   const quien = pre==="CD" ? "Convoca el Consejo Directivo" : (pre==="APRUALS" ? "Convocatoria por iniciativa de asociados (10%)" : "Convocatoria");
   $("eyebrow").textContent = c.codigo + " · " + quien;
   document.title = c.codigo + " — Adhesión a convocatoria";
-  actualizarProgreso(c.firmas, c.minimo, c.total);
+  actualizarProgreso(c.firmas, c.minimo, c.total, c.firmasNA);
   if(c.estado==="CERRADA"){ $("cardFirma").classList.add("hidden"); }
 }
-function actualizarProgreso(f, min, total){
+function actualizarProgreso(f, min, total, na){
   let p = $("prog"); if(!p){ p = el("div","prog"); p.id="prog"; $("conv").appendChild(p); }
-  p.textContent = "Firmas registradas: " + f + ". Referencia del 10% de los " + total + " asociados empadronados: " + min + " firmas.";
+  p.textContent = "Firmas de asociados: " + f + ". Referencia del 10% de los " + total + " asociados empadronados: " + min + " firmas." +
+    (na ? " Vecinos no asociados que respaldan: " + na + "." : "");
 }
 
-/* ---------- verificación por DNI ---------- */
-const URL_EMPADRONAMIENTO = "https://apr-laalamedalimasur.github.io/FORMULARIO-LA-ALAMEDA/";
-let dniVerificado = "";
-function avisoDni(cls, t, conEnlace){
-  const a = $("avisoDni"); a.innerHTML = "";
-  const d = el("div","msg "+cls,t);
-  if(conEnlace){
-    d.appendChild(document.createTextNode(" "));
-    const l = el("a",null,"Empadronarse aquí"); l.href = URL_EMPADRONAMIENTO; l.target="_blank"; l.rel="noopener";
-    d.appendChild(l); d.appendChild(document.createTextNode("."));
-  }
-  a.appendChild(d);
-}
-async function obtenerId(dni, p){
-  if(p.id) return p.id;
-  const r = await apiGet({accion:"buscar", q:p.apellidos});
-  if(!r.ok) throw new Error(r.error||"servidor");
-  const norm = t => String(t||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toUpperCase().trim();
-  const cand = r.resultados.filter(x => norm(x.apellidos)===norm(p.apellidos) && norm(x.nombres)===norm(p.nombres));
-  for(const x of cand){
-    const c = await apiGet({accion:"confirmar", id:x.id, dni});
-    if(c.ok) return x.id;
-    if(c.error==="bloqueado") throw new Error("bloqueado");
-  }
-  throw new Error("servidor");
-}
-$("dni").addEventListener("input", ()=>{ $("avisoDni").innerHTML = ""; });
-$("dni").addEventListener("keydown", e=>{ if(e.key==="Enter") $("verificar").click(); });
+/* ---------- verificación de identidad ---------- */
+function avisoEn(id, cls, t){ const a = $(id); a.innerHTML = ""; a.appendChild(el("div","msg "+cls,t)); }
+function avisoDni(cls, t){ avisoEn("avisoDni", cls, t); }
+["dni","dv","tel4"].forEach(id=>{
+  $(id).addEventListener("input", ()=>{ $("avisoDni").innerHTML = ""; });
+  $(id).addEventListener("keydown", e=>{ if(e.key==="Enter") $("verificar").click(); });
+});
 $("verificar").addEventListener("click", async ()=>{
   const dni = $("dni").value.replace(/\D/g,"");
+  const dv = $("dv").value.trim().toUpperCase();
+  const tel4 = $("tel4").value.replace(/\D/g,"");
   if(dni.length!==8) return avisoDni("err","Ingrese su DNI de 8 dígitos.");
+  if(!/^[0-9A-Z]$/.test(dv)) return avisoDni("err","Ingrese el dígito verificador: el número o letra que aparece después del guion en su DNI.");
+  if(tel4 && tel4.length!==4) return avisoDni("err","Escriba solo los 4 últimos dígitos de su celular.");
   $("verificar").disabled = true; avisoDni("info","Verificando…");
   try{
-    const r = await apiGet({accion:"dni", dni});
-    if(!r.ok){ avisoDni("err", msg(r.error)); return; }
-    if(!r.encontrado){
-      avisoDni("err","Ese DNI no figura en el padrón de asociados, por lo que no puede suscribir esta convocatoria. Si vive en la urbanización y desea asociarse, regístrese y el Consejo evaluará su inscripción.", true);
+    const r = await apiGet({accion:"verificar", c:CODIGO, dni, dv, tel4});
+    if(!r.ok){
+      let t = msg(r.error);
+      if(r.quedan) t += " Le quedan " + r.quedan + " intento(s).";
+      avisoDni("err", t); return;
+    }
+    credencial = { dni, dv, tel4 };
+    if(r.tipo === "NA"){
+      $("paso1").classList.add("hidden"); $("pasoNA").classList.remove("hidden"); $("avisoDni").innerHTML = "";
       return;
     }
-    const id = await obtenerId(dni, r);
-    elegir({ id, nombres:r.nombres, apellidos:r.apellidos }, dni);
-  }catch(e){ avisoDni("err", msg(e.message)); }
+    elegir({ tipo:"ASOCIADO", nombres:r.nombres, apellidos:r.apellidos });
+  }catch(e){ avisoDni("err", msg("servidor")); }
   finally{ $("verificar").disabled = false; }
 });
-function elegir(p, dni){
-  elegido = p; dniVerificado = dni;
+$("naVolver").addEventListener("click", ()=>{ $("pasoNA").classList.add("hidden"); $("paso1").classList.remove("hidden"); credencial = null; });
+$("naSeguir").addEventListener("click", ()=>{
+  const d = { nombres:$("naNombres").value.trim(), apellidos:$("naApellidos").value.trim(), etapa:$("naEtapa").value.trim(),
+              mz:$("naMz").value.trim(), lt:$("naLt").value.trim(), telefono:$("naTel").value.replace(/\D/g,"") };
+  if(d.nombres.length<2 || d.apellidos.length<2) return avisoEn("avisoNA","err","Escriba sus nombres y apellidos.");
+  if(!d.etapa || !d.mz || !d.lt) return avisoEn("avisoNA","err","Indique etapa, manzana y lote.");
+  if(d.telefono.length!==9) return avisoEn("avisoNA","err","Ingrese su celular de 9 dígitos.");
+  if(!$("naDatos").checked) return avisoEn("avisoNA","err","Debe autorizar el tratamiento de sus datos.");
+  $("avisoNA").innerHTML = "";
+  elegir({ tipo:"NA", nombres:d.nombres.toUpperCase(), apellidos:d.apellidos.toUpperCase(), datos:d });
+});
+function elegir(p){
+  elegido = p;
+  $("personaLbl").textContent = p.tipo === "NA" ? "Vecino no asociado (lista aparte)" : "Asociado";
   $("personaTxt").textContent = p.nombres + " " + p.apellidos;
-  $("paso1").classList.add("hidden"); $("paso2").classList.remove("hidden");
+  $("aceptoTxt").textContent = p.tipo === "NA"
+    ? "Declaro que mis datos son verdaderos y respaldo esta convocatoria como vecino no asociado."
+    : "Declaro que soy asociado empadronado y suscribo esta convocatoria.";
+  $("paso1").classList.add("hidden"); $("pasoNA").classList.add("hidden"); $("paso2").classList.remove("hidden");
   limpiarFirma(); $("aviso").innerHTML = ""; $("avisoDni").innerHTML = "";
 }
 $("cambiar").addEventListener("click", ()=>{
-  elegido = null; dniVerificado = "";
-  $("paso2").classList.add("hidden"); $("paso1").classList.remove("hidden");
-  $("dni").value=""; $("avisoDni").innerHTML="";
+  elegido = null; credencial = null;
+  $("paso2").classList.add("hidden"); $("pasoNA").classList.add("hidden"); $("paso1").classList.remove("hidden");
+  ["dni","dv","tel4"].forEach(id=>$(id).value=""); $("avisoDni").innerHTML="";
 });
 
 /* ---------- firma ---------- */
@@ -260,23 +289,25 @@ iniciarLienzo();
 /* ---------- enviar ---------- */
 function aviso(cls, t){ const a=$("aviso"); a.innerHTML=""; a.appendChild(el("div","msg "+cls,t)); }
 $("enviar").addEventListener("click", async ()=>{
-  if(!elegido) return;
-  const dni = dniVerificado;
+  if(!elegido || !credencial) return;
   if(!hayTrazo) return aviso("err","Falta su firma. Fírme en el recuadro.");
   if(!$("acepto").checked || !$("manus").checked) return aviso("err",MENSAJES.acepto);
   $("enviar").disabled = true; aviso("info","Enviando…");
   try{
-    const r = await apiPost({ accion:"firmar", c:CODIGO, id:elegido.id, dni, firma:cv.toDataURL("image/png"), manuscrito:true, acepto:true });
+    const r = await apiPost({ accion:"firmar", c:CODIGO, tipo:elegido.tipo, dni:credencial.dni, dv:credencial.dv, tel4:credencial.tel4,
+      datos:elegido.datos || null, datosOk: elegido.tipo === "NA" ? true : undefined,
+      firma:cv.toDataURL("image/png"), manuscrito:true, acepto:true });
     if(r.ok){
       $("contenido").classList.add("hidden");
       $("listo").classList.remove("hidden");
-      $("listoTxt").textContent = elegido.nombres + " " + elegido.apellidos + " · N° de orden " + r.orden + " · " + r.fecha + " " + r.hora + " (hora de Lima)";
+      $("listoTxt").textContent = elegido.nombres + " " + elegido.apellidos + (r.tipo === "NA" ? " · Vecino no asociado" : "") +
+        " · N° de orden " + r.orden + " · " + r.fecha + " " + r.hora + " (hora de Lima)";
       $("listoCod").textContent = r.constancia;
       window.scrollTo(0,0);
     } else if(r.error==="ya_firmo"){
       aviso("err", msg("ya_firmo") + (r.fecha ? " Registrada el " + r.fecha + " a las " + r.hora + " (N° " + r.orden + ")." : ""));
       $("enviar").disabled = false;
-    } else { aviso("err", msg(r.error)); $("enviar").disabled = false; }
+    } else { aviso("err", msg(r.error) + (r.quedan ? " Le quedan " + r.quedan + " intento(s)." : "")); $("enviar").disabled = false; }
   }catch(e){ aviso("err", msg("servidor")); $("enviar").disabled = false; }
 });
 
