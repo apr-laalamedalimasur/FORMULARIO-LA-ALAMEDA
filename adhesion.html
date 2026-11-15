@@ -217,7 +217,7 @@ $("verificar").addEventListener("click", async ()=>{
   if(tel4 && tel4.length!==4) return avisoDni("err","Escriba solo los 4 últimos dígitos de su celular.");
   $("verificar").disabled = true; avisoDni("info","Verificando…");
   try{
-    const r = await apiGet({accion:"verificar", c:CODIGO, dni, dv, tel4});
+    const r = await apiGet({accion:"verificar", cod:CODIGO, dni, dv, tel4});
     if(!r.ok){
       let t = msg(r.error);
       if(r.quedan) t += " Le quedan " + r.quedan + " intento(s).";
