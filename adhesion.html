@@ -74,8 +74,8 @@ footer{text-align:center; font-size:11.5px; color:var(--ink-soft); margin-top:24
   <div id="contenido" class="hidden">
     <div class="card conv" id="conv"></div>
     <div class="card" id="cardFirma">
-      <h2>Suscribir esta convocatoria</h2>
-      <p class="sub">Los asociados empadronados firman con su DNI, el dígito verificador del DNI y los 4 últimos dígitos del celular que registraron en la Asociación. Los vecinos que no figuran en el padrón pueden respaldar la convocatoria: su firma va en una lista aparte y no se cuenta para el 10 %.</p>
+      <h2 id="firmaTitulo">Suscribir esta convocatoria</h2>
+      <p class="sub" id="firmaSub">Los asociados empadronados firman con su DNI, el dígito verificador del DNI y los 4 últimos dígitos del celular que registraron en la Asociación. Los vecinos que no figuran en el padrón pueden respaldar la convocatoria: su firma va en una lista aparte y no se cuenta para el 10 %.</p>
 
       <div id="paso1">
         <div class="field">
@@ -124,7 +124,7 @@ footer{text-align:center; font-size:11.5px; color:var(--ink-soft); margin-top:24
           <div class="pad-tools"><span>Puede borrar y volver a firmar antes de enviar.</span><button type="button" class="btn-link" id="borrar">Borrar y volver a firmar</button></div>
         </div>
         <label class="chk"><input type="checkbox" id="acepto"><span id="aceptoTxt">Declaro que soy asociado empadronado y suscribo esta convocatoria.</span></label>
-        <label class="chk"><input type="checkbox" id="manus"><span>Me comprometo a ratificar mi firma en manuscrito en la lista impresa que se presentará con esta convocatoria.</span></label>
+        <label class="chk" id="manusBox"><input type="checkbox" id="manus"><span>Me comprometo a ratificar mi firma en manuscrito en la lista impresa que se presentará con esta convocatoria.</span></label>
         <button type="button" class="btn" id="enviar">Firmar y enviar</button>
         <div id="aviso"></div>
       </div>
@@ -132,10 +132,10 @@ footer{text-align:center; font-size:11.5px; color:var(--ink-soft); margin-top:24
   </div>
 
   <div id="listo" class="card constancia hidden">
-    <div class="big">✔ Firma registrada</div>
+    <div class="big" id="listoBig">✔ Firma registrada</div>
     <p class="sub" id="listoTxt"></p>
     <div class="cod" id="listoCod"></div>
-    <div class="msg info">Guarde este código. Recuerde firmar a mano la lista impresa: la firma digital es un respaldo y la lista impresa es la que se presenta.</div>
+    <div class="msg info" id="listoInfo">Guarde este código. Recuerde firmar a mano la lista impresa: la firma digital es un respaldo y la lista impresa es la que se presenta.</div>
   </div>
 
   <footer>Sus datos y su firma se guardan en una hoja privada de la Asociación y no se muestran en esta página.<br>Ley N° 29733 · Contacto: WhatsApp 987714309 · sosalamedalimasur@gmail.com</footer>
@@ -151,12 +151,13 @@ const MENSAJES = {
   cerrada:"Esta convocatoria ya está cerrada y no recibe más firmas.",
   limite:"Hay muchas consultas en este momento. Espere un minuto e intente de nuevo.",
   firma:"La firma no es válida. Bórrela y vuelva a firmar.",
-  acepto:"Debe marcar las dos casillas de conformidad.",
+  acepto:"Debe marcar la(s) casilla(s) de conformidad.",
   datos:"Revise los datos ingresados.",
   no_existe:"No encontramos esta convocatoria. Verifique el enlace que recibió.",
   codigo:"El enlace no tiene un código de convocatoria válido.",
   servidor:"Hubo un problema en el servidor. Intente de nuevo en unos minutos.",
   dv:"El dígito verificador no corresponde a ese DNI. Revíselo en su DNI físico (el número o letra después del guion).",
+  solo_asociados:"Esta notificación es solo para asociados inscritos en el padrón.",
   tel:"Los 4 dígitos no coinciden con el celular registrado en la Asociación. Si cambió de número, comuníquese por WhatsApp (987714309)."
 };
 function msg(e){ return MENSAJES[e] || MENSAJES.servidor; }
@@ -170,7 +171,7 @@ async function apiPost(obj){
 }
 function el(tag, cls, txt){ const e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e; }
 
-let CODIGO = "", elegido = null, hayTrazo = false, credencial = null;
+let CODIGO = "", elegido = null, hayTrazo = false, credencial = null, NOTIF = false;
 
 function mostrarError(t){ $("cargando").classList.add("hidden"); $("error").classList.remove("hidden"); $("errorTxt").textContent = t; }
 
@@ -191,12 +192,25 @@ function pintarConvocatoria(c){
   const pre = c.codigo.split(/\d/)[0];
   const quien = pre==="CD" ? "Convoca el Consejo Directivo" : (pre==="APRUALS" ? "Convocatoria por iniciativa de asociados (10%)" : "Convocatoria");
   $("eyebrow").textContent = c.codigo + " · " + quien;
-  document.title = c.codigo + " — Adhesión a convocatoria";
+  NOTIF = c.modo === "NOTIFICACION";
+  document.title = c.codigo + (NOTIF ? " — Notificación de convocatoria" : " — Adhesión a convocatoria");
+  if(NOTIF) modoNotificacion(c);
   actualizarProgreso(c.firmas, c.minimo, c.total, c.firmasNA);
   if(c.estado==="CERRADA"){ $("cardFirma").classList.add("hidden"); }
 }
+function modoNotificacion(c){
+  $("heroTitulo").textContent = "Notificación de convocatoria";
+  $("firmaTitulo").textContent = "Cargo de recepción";
+  $("firmaSub").textContent = "Cada asociado empadronado firma el cargo de recepción con su DNI, el dígito verificador del DNI " +
+    "y los 4 últimos dígitos del celular que registró en la Asociación. Su firma acredita que fue notificado de esta convocatoria.";
+  $("manusBox").classList.add("hidden"); $("manus").checked = true;
+  $("enviar").textContent = "Firmar cargo de recepción";
+  $("listoBig").textContent = "✔ Cargo de recepción registrado";
+  $("listoInfo").textContent = "Guarde este código: es su constancia de haber sido notificado. Puede tomar una captura de pantalla.";
+}
 function actualizarProgreso(f, min, total, na){
   let p = $("prog"); if(!p){ p = el("div","prog"); p.id="prog"; $("conv").appendChild(p); }
+  if(NOTIF){ p.textContent = "Asociados notificados por este medio: " + f + " de " + total + " empadronados."; return; }
   p.textContent = "Firmas de asociados: " + f + ". Referencia del 10% de los " + total + " asociados empadronados: " + min + " firmas." +
     (na ? " Vecinos no asociados que respaldan: " + na + "." : "");
 }
@@ -224,6 +238,11 @@ $("verificar").addEventListener("click", async ()=>{
       avisoDni("err", t); return;
     }
     credencial = { dni, dv, tel4 };
+    if(r.tipo === "NA" && NOTIF){
+      avisoDni("info","Su DNI no figura en el Libro Registro de Padrón de Socios. Esta notificación es para los asociados " +
+        "inscritos. Si es asociado y cree que es un error, comuníquese por WhatsApp (987714309).");
+      credencial = null; return;
+    }
     if(r.tipo === "NA"){
       $("paso1").classList.add("hidden"); $("pasoNA").classList.remove("hidden"); $("avisoDni").innerHTML = "";
       return;
@@ -249,7 +268,8 @@ function elegir(p){
   $("personaTxt").textContent = p.nombres + " " + p.apellidos;
   $("aceptoTxt").textContent = p.tipo === "NA"
     ? "Declaro que mis datos son verdaderos y respaldo esta convocatoria como vecino no asociado."
-    : "Declaro que soy asociado empadronado y suscribo esta convocatoria.";
+    : (NOTIF ? "Declaro haber recibido y leído la Convocatoria " + CODIGO + " a Asamblea General Extraordinaria de Elecciones."
+             : "Declaro que soy asociado empadronado y suscribo esta convocatoria.");
   $("paso1").classList.add("hidden"); $("pasoNA").classList.add("hidden"); $("paso2").classList.remove("hidden");
   limpiarFirma(); $("aviso").innerHTML = ""; $("avisoDni").innerHTML = "";
 }
