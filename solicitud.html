@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reportar una necesidad — Alameda Lima Sur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF2EF; --paper:#FFFFFF; --ink:#182823; --ink-soft:#4B5D57;
+  --line:#D7E0DA; --line-soft:#E7ECE8; --primary:#1F5C4F; --primary-dark:#123D34;
+  --accent:#C4882F; --accent-soft:#F3E2C3; --ok:#2F8558; --ok-bg:#E5F3EA;
+  --bad:#AF4B37; --bad-bg:#FBE9E4;
+}
+*{box-sizing:border-box;}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:'Inter',sans-serif; min-height:100vh;}
+.app{max-width:680px; margin:0 auto; padding:20px 16px 70px;}
+.hero{background:var(--primary); border-radius:14px; padding:20px; color:#fff; margin-bottom:16px;}
+.hero .eyebrow{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent-soft); margin:0 0 6px;}
+.hero h1{font-family:'Fraunces',serif; font-size:19px; margin:0 0 6px; line-height:1.3;}
+.hero p{margin:0; font-size:12.5px; color:#D7E6DE; line-height:1.5;}
+.card{background:var(--paper); border:1px solid var(--line); border-radius:12px; padding:18px; margin-bottom:16px;}
+.card h2{font-family:'Fraunces',serif; font-size:16px; margin:0 0 4px;}
+.card .sub{color:var(--ink-soft); font-size:12.5px; margin:0 0 12px; line-height:1.5;}
+.conv h3.t{font-family:'Fraunces',serif; font-size:17px; text-align:center; margin:0 0 6px; color:var(--primary-dark);}
+.conv h4.st{font-size:13px; text-align:center; margin:0 0 12px; color:var(--ink-soft); letter-spacing:.03em;}
+.conv h5.en{font-size:13px; margin:14px 0 4px; color:var(--primary-dark);}
+.conv p{font-size:13.5px; line-height:1.65; margin:0 0 9px; white-space:pre-line;}
+.conv ol,.conv ul{margin:0 0 10px; padding-left:22px; font-size:13.5px; line-height:1.6;}
+.conv li{margin-bottom:4px; white-space:pre-line;}
+.prog{background:var(--accent-soft); color:#5A4012; border-radius:8px; padding:9px 11px; font-size:12.5px; line-height:1.5; margin-top:12px;}
+.field label{display:block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--ink-soft); margin-bottom:4px;}
+.field{margin-bottom:12px;}
+.field input[type=text],.field input[type=search],.field input[type=password],.field input[type=tel]{width:100%; padding:11px; border:1px solid var(--line); border-radius:8px; font-size:14px; background:#FBFCFB; font-family:'Inter',sans-serif;}
+.res{margin-top:6px;}
+.res button{display:block; width:100%; text-align:left; background:#fff; border:1px solid var(--line); border-radius:8px; padding:10px 11px; margin-bottom:6px; font-size:13.5px; cursor:pointer; font-family:'Inter',sans-serif;}
+.res button:hover{background:var(--ok-bg);}
+.res .vacio{font-size:12.5px; color:var(--ink-soft); padding:6px 2px;}
+.persona{background:var(--ok-bg); border:1px solid #BFE0CC; border-radius:8px; padding:10px 12px; font-size:14px; font-weight:600; display:flex; justify-content:space-between; gap:10px; align-items:center;}
+.persona button{background:none; border:none; color:var(--primary-dark); font-weight:700; font-size:12px; cursor:pointer; text-decoration:underline;}
+.pad-wrap{border:1.5px dashed var(--primary); border-radius:10px; background:#fff; position:relative;}
+.pad-wrap canvas{display:block; width:100%; height:170px; touch-action:none; cursor:crosshair; border-radius:10px;}
+.pad-hint{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#9AA9A3; font-size:13px; pointer-events:none;}
+.pad-wrap.firmado .pad-hint{display:none;}
+.pad-tools{display:flex; justify-content:space-between; align-items:center; margin-top:6px; font-size:12px; color:var(--ink-soft);}
+.btn-link{background:none; border:none; color:var(--bad); font-weight:700; font-size:12.5px; cursor:pointer; text-decoration:underline; font-family:'Inter',sans-serif;}
+.chk{display:flex; gap:9px; align-items:flex-start; font-size:13px; line-height:1.5; margin:10px 0; color:var(--ink);}
+.chk input{margin-top:3px; flex:0 0 auto; width:17px; height:17px;}
+.btn{width:100%; border:none; border-radius:10px; padding:14px 16px; font-weight:700; font-size:14.5px; cursor:pointer; background:var(--primary); color:#fff; font-family:'Inter',sans-serif; margin-top:6px;}
+.btn:disabled{opacity:.5; cursor:not-allowed;}
+.msg{border-radius:8px; padding:10px 12px; font-size:13px; line-height:1.5; margin-top:10px;}
+.msg.err{background:var(--bad-bg); color:#7C2D1F;}
+.msg.ok{background:var(--ok-bg); color:#1D5A39;}
+.msg.info{background:var(--accent-soft); color:#5A4012;}
+.constancia{text-align:center;}
+.constancia .big{font-family:'Fraunces',serif; font-size:20px; color:var(--ok); margin:4px 0;}
+.constancia .cod{font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:600; background:#F3F6F4; border:1px solid var(--line); border-radius:8px; padding:8px; margin:10px 0;}
+.hidden{display:none !important;}
+footer{text-align:center; font-size:11.5px; color:var(--ink-soft); margin-top:24px; line-height:1.6;}
+
+.field select,.field textarea,.field input[type=url],.field input[type=email]{width:100%; padding:11px; border:1px solid var(--line); border-radius:8px; font-size:14px; background:#FBFCFB; font-family:'Inter',sans-serif;}
+.field textarea{min-height:90px; resize:vertical;}
+.field .ayuda{font-size:11.5px; color:var(--ink-soft); margin-top:4px; line-height:1.45;}
+.fila3{display:flex; gap:8px;} .fila3 .field{flex:1;}
+.fotos{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;}
+.fotos figure{margin:0; position:relative; width:110px; height:110px; border-radius:8px; overflow:hidden; border:1px solid var(--line);}
+.fotos img{width:100%; height:100%; object-fit:cover;}
+.fotos button{position:absolute; top:4px; right:4px; background:#fff; border:none; border-radius:50%; width:24px; height:24px; font-weight:700; cursor:pointer;}
+.paso-tit{font-family:'Fraunces',serif; font-size:15px; margin:4px 0 10px; color:var(--primary-dark);}
+.modal{position:fixed; inset:0; background:rgba(18,40,35,.55); display:flex; align-items:center; justify-content:center; padding:18px; z-index:50;}
+.modal .box{background:#fff; border-radius:14px; max-width:440px; padding:20px; box-shadow:0 10px 40px rgba(0,0,0,.25);}
+.modal h3{font-family:'Fraunces',serif; margin:0 0 8px; color:var(--primary-dark); font-size:18px;}
+.modal p{font-size:13.5px; line-height:1.6; margin:0 0 10px;}
+.modal a{color:var(--primary-dark); font-weight:700;}
+.btn-sec{background:#fff; color:var(--primary-dark); border:1.5px solid var(--primary);}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="hero">
+    <p class="eyebrow">Asociación Alameda Lima Sur</p>
+    <h1>Reportar una necesidad</h1>
+    <p>Registre su pedido. La Asociación lo presentará mediante carta a la entidad que corresponda: Municipalidad Distrital de Chilca (y sus áreas), Luz del Sur, EMAPA Cañete u otra.</p>
+  </div>
+
+  <div class="card" id="card1">
+    <p class="paso-tit">1. Identificación del solicitante</p>
+    <p class="sub">Asociados: DNI, dígito verificador y los 4 últimos dígitos del celular registrado. Vecinos no asociados: DNI y dígito verificador (deje el celular en blanco).</p>
+    <div id="paso1">
+      <div class="field"><label for="dni">Número de DNI</label><input type="tel" id="dni" inputmode="numeric" maxlength="8" placeholder="8 dígitos" autocomplete="off"></div>
+      <div class="field"><label for="dv">Dígito verificador del DNI</label><input type="text" id="dv" maxlength="1" placeholder="El número o letra después del guion (12345678-9)" autocomplete="off" style="text-transform:uppercase"></div>
+      <div class="field"><label for="tel4">Últimos 4 dígitos de su celular registrado</label><input type="tel" id="tel4" inputmode="numeric" maxlength="4" placeholder="Solo asociados" autocomplete="off"></div>
+      <button type="button" class="btn" id="verificar">Verificar</button>
+      <div id="avisoDni"></div>
+    </div>
+    <div id="pasoDatos" class="hidden">
+      <div class="field"><label id="personaLbl">Asociado</label><div class="persona"><span id="personaTxt"></span><button type="button" id="cambiar">No soy yo</button></div></div>
+      <div id="naNombres" class="hidden">
+        <div class="field"><label for="nombres">Nombres</label><input type="text" id="nombres" maxlength="60"></div>
+        <div class="field"><label for="apellidos">Apellidos</label><input type="text" id="apellidos" maxlength="60"></div>
+      </div>
+      <p class="sub" style="margin:0 0 6px">Su domicilio en la urbanización (verifíquelo):</p>
+      <div class="fila3">
+        <div class="field"><label for="etapa">Etapa</label><input type="text" id="etapa" maxlength="10"></div>
+        <div class="field"><label for="mz">Manzana</label><input type="text" id="mz" maxlength="10"></div>
+        <div class="field"><label for="lt">Lote</label><input type="text" id="lt" maxlength="10"></div>
+      </div>
+      <div class="field"><label for="celular">Celular de contacto</label><input type="tel" id="celular" inputmode="numeric" maxlength="9" placeholder="9 dígitos"></div>
+      <div class="field"><label for="correo">Correo electrónico (opcional)</label><input type="email" id="correo" maxlength="80"></div>
+    </div>
+  </div>
+
+  <div class="card hidden" id="card2">
+    <p class="paso-tit">2. Su necesidad</p>
+    <div class="field"><label for="necesidad">Tipo de necesidad</label>
+      <select id="necesidad">
+        <option value="">— Elija una opción —</option>
+        <option>Alumbrado público</option>
+        <option>Limpieza y recojo de residuos</option>
+        <option>Áreas verdes y parques</option>
+        <option>Pistas y veredas</option>
+        <option>Agua y desagüe</option>
+        <option>Señalización y seguridad vial</option>
+        <option value="__otro">Otro (especifique)</option>
+      </select>
+      <input type="text" id="necesidadOtro" class="hidden" maxlength="80" placeholder="Escriba el tipo de necesidad" style="margin-top:8px; width:100%; padding:11px; border:1px solid var(--line); border-radius:8px; font-size:14px;">
+    </div>
+    <div class="field"><label for="destino">¿A quién se dirige?</label>
+      <select id="destino"><option value="">Cargando…</option></select>
+      <div class="ayuda" id="destinoAyuda">Se sugiere según el tipo de necesidad; puede cambiarlo.</div>
+      <div id="destinoOtroBox" class="hidden" style="margin-top:8px">
+        <input type="text" id="destinoEntidad" maxlength="100" placeholder="Entidad (ej.: Municipalidad Provincial de Cañete)" style="width:100%; padding:11px; border:1px solid var(--line); border-radius:8px; font-size:14px; margin-bottom:6px">
+        <input type="text" id="destinoArea" maxlength="120" placeholder="Área u oficina (opcional)" style="width:100%; padding:11px; border:1px solid var(--line); border-radius:8px; font-size:14px">
+      </div>
+    </div>
+    <div class="field"><label for="calles">Ingrese la etapa y las calles que se intersectan (si cuentan con nombre, escríbalo)</label>
+      <textarea id="calles" maxlength="300" placeholder="Ej.: Etapa 4, cruce de Calle F2 con Calle 12"></textarea></div>
+    <div class="field"><label for="maps">Enlace de Google Maps de la ubicación</label>
+      <input type="url" id="maps" maxlength="400" placeholder="https://maps.app.goo.gl/...">
+      <div class="ayuda">En Google Maps mantenga presionado el punto exacto → <b>Compartir</b> → <b>Copiar enlace</b>, y péguelo aquí.</div></div>
+    <div class="field"><label for="descripcion">Describa el problema</label>
+      <textarea id="descripcion" maxlength="1500" placeholder="Qué ocurre, desde cuándo y a quiénes afecta"></textarea></div>
+    <div class="field"><label>Fotografías (máximo 2)</label>
+      <input type="file" id="fotoInput" accept="image/*" multiple>
+      <div class="fotos" id="fotos"></div></div>
+    <div class="field"><label>Firma del solicitante</label>
+      <div class="pad-wrap" id="padWrap"><canvas id="pad" width="600" height="240"></canvas><div class="pad-hint">Firme aquí</div></div>
+      <div class="pad-tools"><span>Firme con el dedo o el mouse.</span><button type="button" class="btn-link" id="borrar">Borrar y volver a firmar</button></div></div>
+    <label class="chk"><input type="checkbox" id="acepto"><span>Declaro que la información es verdadera y autorizo a la Asociación a presentar esta solicitud a la entidad elegida y a tratar mis datos personales solo para este fin (Ley N° 29733).</span></label>
+    <button type="button" class="btn" id="enviar">Enviar solicitud</button>
+    <div id="aviso"></div>
+  </div>
+
+  <div class="card hidden constancia" id="listo">
+    <p class="sub" style="margin:0">Solicitud registrada</p>
+    <p class="big">¡Gracias!</p>
+    <div class="cod" id="listoCod"></div>
+    <p class="sub" id="listoTxt"></p>
+    <p class="sub">La Asociación presentará la carta a la entidad elegida y le informará la respuesta. Consultas: WhatsApp 987714309.</p>
+  </div>
+
+  <footer>Sus datos se guardan en una hoja privada de la Asociación y no se muestran en esta página.<br>Ley N° 29733 · Contacto: WhatsApp 987714309 · sosalamedalimasur@gmail.com</footer>
+</div>
+
+<div class="modal hidden" id="modalNA" role="dialog" aria-modal="true">
+  <div class="box">
+    <h3>Estimado vecino</h3>
+    <p>Su DNI no figura en el padrón de asociados. <b>Recibiremos su solicitud de todos modos</b>: no es requisito estar asociado.</p>
+    <p>Lo invitamos a <b>empadronarse y ser parte de la Asociación</b>. Puede leer el Estatuto y registrarse aquí:<br>
+      <a href="https://apr-laalamedalimasur.github.io/FORMULARIO-LA-ALAMEDA/" target="_blank" rel="noopener">apr-laalamedalimasur.github.io/FORMULARIO-LA-ALAMEDA</a> (botón “Ver Estatuto”).</p>
+    <button type="button" class="btn" id="modalOk">Continuar con mi solicitud</button>
+  </div>
+</div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbzYaDOIVyaN2KJ8bewTnHYmwYWkvOOnxwz6Wq-1lq9wzjquz-1UahDVokHC8-8DOl-xNw/exec";
+const $ = id => document.getElementById(id);
+const MENSAJES = {
+  bloqueado:"Ese DNI quedó bloqueado por demasiados intentos fallidos. Comuníquese por WhatsApp (987714309).",
+  dv:"El dígito verificador no corresponde a ese DNI. Revíselo en su DNI físico (el número o letra después del guion).",
+  tel:"Los 4 dígitos no coinciden con el celular registrado en la Asociación. Si cambió de número, escriba al WhatsApp 987714309.",
+  limite:"Hay muchas consultas en este momento. Espere un minuto e intente de nuevo.",
+  datos:"Revise los datos: complete todos los campos obligatorios.",
+  maps:"El enlace no es de Google Maps. Cópielo desde Google Maps con la opción Compartir.",
+  foto:"Una de las fotos no es válida. Quítela y vuelva a adjuntarla.",
+  firma:"La firma no es válida. Bórrela y vuelva a firmar.",
+  acepto:"Debe marcar la casilla de conformidad.",
+  destino:"Elija a quién se dirige la solicitud o escriba la entidad.",
+  servidor:"Hubo un problema en el servidor. Intente de nuevo en unos minutos."
+};
+function msg(e){ return MENSAJES[e] || MENSAJES.servidor; }
+function el(tag, cls, txt){ const e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e; }
+function avisoEn(id, cls, t){ const a=$(id); a.innerHTML=""; a.appendChild(el("div","msg "+cls,t)); }
+async function apiGet(params){ const r = await fetch(API_URL + "?" + new URLSearchParams(params).toString()); return r.json(); }
+async function apiPost(obj){ const r = await fetch(API_URL, { method:"POST", headers:{ "Content-Type":"text/plain;charset=utf-8" }, body: JSON.stringify(obj) }); return r.json(); }
+
+let cred = null, tipo = null, fotos = [];
+
+/* ---------- identificación ---------- */
+["dni","dv","tel4"].forEach(id=>{ $(id).addEventListener("input", ()=>{ $("avisoDni").innerHTML=""; });
+  $(id).addEventListener("keydown", e=>{ if(e.key==="Enter") $("verificar").click(); }); });
+$("verificar").addEventListener("click", async ()=>{
+  const dni=$("dni").value.replace(/\D/g,""), dv=$("dv").value.trim().toUpperCase(), tel4=$("tel4").value.replace(/\D/g,"");
+  if(dni.length!==8) return avisoEn("avisoDni","err","Ingrese su DNI de 8 dígitos.");
+  if(!/^[0-9A-Z]$/.test(dv)) return avisoEn("avisoDni","err","Ingrese el dígito verificador: el número o letra después del guion en su DNI.");
+  if(tel4 && tel4.length!==4) return avisoEn("avisoDni","err","Escriba solo los 4 últimos dígitos de su celular.");
+  $("verificar").disabled=true; avisoEn("avisoDni","info","Verificando…");
+  try{
+    const r = await apiGet({accion:"verificar", cod:"SOLICITUD", dni, dv, tel4});
+    if(!r.ok){ let t=msg(r.error); if(r.quedan) t+=" Le quedan "+r.quedan+" intento(s)."; return avisoEn("avisoDni","err",t); }
+    cred={dni,dv,tel4}; tipo=r.tipo; $("avisoDni").innerHTML="";
+    $("paso1").classList.add("hidden"); $("pasoDatos").classList.remove("hidden"); $("card2").classList.remove("hidden");
+    if(r.tipo==="ASOCIADO"){
+      $("personaLbl").textContent="Asociado"; $("personaTxt").textContent=r.nombres+" "+r.apellidos;
+      $("naNombres").classList.add("hidden");
+      $("etapa").value=r.etapa||""; $("mz").value=r.mz||""; $("lt").value=r.lt||"";
+    } else {
+      $("personaLbl").textContent="Vecino no asociado"; $("personaTxt").textContent="DNI "+dni;
+      $("naNombres").classList.remove("hidden");
+      $("modalNA").classList.remove("hidden");
+    }
+  }catch(e){ avisoEn("avisoDni","err",msg("servidor")); }
+  finally{ $("verificar").disabled=false; }
+});
+$("modalOk").addEventListener("click", ()=>{ $("modalNA").classList.add("hidden"); $("nombres").focus(); });
+$("cambiar").addEventListener("click", ()=>{ cred=null; tipo=null;
+  $("pasoDatos").classList.add("hidden"); $("card2").classList.add("hidden"); $("paso1").classList.remove("hidden");
+  ["dni","dv","tel4"].forEach(id=>$(id).value=""); });
+
+/* ---------- tipo "Otro" ---------- */
+$("necesidad").addEventListener("change", ()=>{
+  $("necesidadOtro").classList.toggle("hidden", $("necesidad").value!=="__otro");
+  sugerirDestino($("necesidad").value);
+});
+/* ---------- destinatarios (pestaña DESTINATARIOS de la hoja) ---------- */
+let DEST = [];
+function pintarDestinos(){
+  const s = $("destino"); s.innerHTML = "";
+  s.appendChild(new Option("— Elija a quién se dirige —", ""));
+  const grupos = {};
+  DEST.forEach((d,i)=>{
+    if(!grupos[d.entidad]){ grupos[d.entidad] = document.createElement("optgroup"); grupos[d.entidad].label = d.entidad; s.appendChild(grupos[d.entidad]); }
+    grupos[d.entidad].appendChild(new Option(d.area || d.entidad, String(i)));
+  });
+  s.appendChild(new Option("Otra entidad u oficina (escribir)", "__otro"));
+}
+function sugerirDestino(nec){
+  const i = DEST.findIndex(d => d.necesidades.indexOf(nec) >= 0);
+  if(i >= 0){ $("destino").value = String(i); $("destinoOtroBox").classList.add("hidden"); }
+}
+$("destino").addEventListener("change", ()=>{ $("destinoOtroBox").classList.toggle("hidden", $("destino").value!=="__otro"); });
+function destinoElegido(){
+  const v = $("destino").value;
+  if(v === "__otro"){
+    const e = $("destinoEntidad").value.trim();
+    return e.length >= 3 ? { entidad:e, area:$("destinoArea").value.trim() } : null;
+  }
+  return v === "" ? null : { entidad:DEST[+v].entidad, area:DEST[+v].area };
+}
+(async function(){
+  try{ const r = await apiGet({accion:"destinatarios"}); if(r.ok) DEST = r.lista || []; }catch(e){}
+  if(!DEST.length) DEST = [{entidad:"MUNICIPALIDAD DISTRITAL DE CHILCA", area:"SUB GERENCIA DE SERVICIOS A LA CIUDAD", necesidades:[]}];
+  pintarDestinos();
+})();
+
+/* ---------- fotos (se reducen antes de enviar) ---------- */
+function reducir(file){
+  return new Promise((ok,mal)=>{
+    const img=new Image(), url=URL.createObjectURL(file);
+    img.onload=()=>{ const max=1280; let w=img.naturalWidth, h=img.naturalHeight;
+      if(Math.max(w,h)>max){ const k=max/Math.max(w,h); w=Math.round(w*k); h=Math.round(h*k); }
+      const c=document.createElement("canvas"); c.width=w; c.height=h; c.getContext("2d").drawImage(img,0,0,w,h);
+      URL.revokeObjectURL(url); ok(c.toDataURL("image/jpeg",0.78)); };
+    img.onerror=()=>{ URL.revokeObjectURL(url); mal(new Error("foto")); };
+    img.src=url;
+  });
+}
+function pintarFotos(){
+  const f=$("fotos"); f.innerHTML="";
+  fotos.forEach((d,i)=>{ const fig=el("figure"); const im=el("img"); im.src=d; im.alt="Foto "+(i+1);
+    const b=el("button",null,"×"); b.type="button"; b.title="Quitar"; b.onclick=()=>{ fotos.splice(i,1); pintarFotos(); };
+    fig.appendChild(im); fig.appendChild(b); f.appendChild(fig); });
+}
+$("fotoInput").addEventListener("change", async e=>{
+  for(const file of Array.from(e.target.files)){ if(fotos.length>=2) break;
+    try{ fotos.push(await reducir(file)); }catch(_){ avisoEn("aviso","err","No se pudo leer una de las fotos."); } }
+  e.target.value=""; pintarFotos();
+});
+
+/* ---------- firma ---------- */
+const cv=$("pad"), cx=cv.getContext("2d"); let dib=false, puntos=0, hayTrazo=false;
+function lienzo(){ cx.fillStyle="#FFF"; cx.fillRect(0,0,cv.width,cv.height); cx.strokeStyle="#111"; cx.lineWidth=3; cx.lineCap="round"; cx.lineJoin="round"; }
+function pos(e){ const r=cv.getBoundingClientRect(); return {x:(e.clientX-r.left)*cv.width/r.width, y:(e.clientY-r.top)*cv.height/r.height}; }
+cv.addEventListener("pointerdown", e=>{ e.preventDefault(); dib=true; try{cv.setPointerCapture(e.pointerId);}catch(_){}
+  const p=pos(e); cx.beginPath(); cx.moveTo(p.x,p.y); cx.lineTo(p.x+.1,p.y+.1); cx.stroke(); });
+cv.addEventListener("pointermove", e=>{ if(!dib) return; e.preventDefault(); const p=pos(e); cx.lineTo(p.x,p.y); cx.stroke(); cx.beginPath(); cx.moveTo(p.x,p.y);
+  puntos++; if(puntos>15){ hayTrazo=true; $("padWrap").classList.add("firmado"); } });
+["pointerup","pointercancel","pointerleave"].forEach(ev=>cv.addEventListener(ev,()=>{ dib=false; }));
+function limpiar(){ puntos=0; hayTrazo=false; $("padWrap").classList.remove("firmado"); lienzo(); }
+$("borrar").addEventListener("click", limpiar); lienzo();
+
+/* ---------- enviar ---------- */
+$("enviar").addEventListener("click", async ()=>{
+  if(!cred) return;
+  let nec=$("necesidad").value; if(nec==="__otro") nec=$("necesidadOtro").value.trim();
+  const datos={ nombres:$("nombres").value.trim(), apellidos:$("apellidos").value.trim(), etapa:$("etapa").value.trim(),
+    mz:$("mz").value.trim(), lt:$("lt").value.trim(), celular:$("celular").value.replace(/\D/g,""), correo:$("correo").value.trim() };
+  const maps=$("maps").value.trim(), calles=$("calles").value.trim(), desc=$("descripcion").value.trim();
+  if(tipo==="NA" && (datos.nombres.length<2 || datos.apellidos.length<2)) return avisoEn("aviso","err","Escriba sus nombres y apellidos (sección 1).");
+  if(!datos.etapa || !datos.mz || !datos.lt) return avisoEn("aviso","err","Indique su etapa, manzana y lote (sección 1).");
+  if(datos.celular.length!==9) return avisoEn("aviso","err","Ingrese su celular de 9 dígitos (sección 1).");
+  if(!nec || nec.length<3) return avisoEn("aviso","err","Elija o escriba el tipo de necesidad.");
+  const destinatario = destinoElegido();
+  if(!destinatario) return avisoEn("aviso","err",msg("destino"));
+  if(calles.length<3) return avisoEn("aviso","err","Indique la etapa y las calles que se intersectan.");
+  if(!/^https:\/\/(maps\.app\.goo\.gl|goo\.gl\/maps|(www\.)?google\.[a-z.]+\/maps|maps\.google\.[a-z.]+)\//i.test(maps)) return avisoEn("aviso","err",msg("maps"));
+  if(desc.length<10) return avisoEn("aviso","err","Describa el problema (al menos una línea).");
+  if(!hayTrazo) return avisoEn("aviso","err","Falta su firma.");
+  if(!$("acepto").checked) return avisoEn("aviso","err",msg("acepto"));
+  $("enviar").disabled=true; avisoEn("aviso","info","Enviando y generando la carta… puede tardar unos segundos.");
+  try{
+    const r = await apiPost({ accion:"solicitud", dni:cred.dni, dv:cred.dv, tel4:cred.tel4, datos, datosOk:true,
+      necesidad:nec, destinatario, calles, maps, descripcion:desc, fotos, firma:cv.toDataURL("image/png") });
+    if(r.ok){
+      $("card1").classList.add("hidden"); $("card2").classList.add("hidden"); $("listo").classList.remove("hidden");
+      $("listoCod").textContent=r.numero; $("listoTxt").textContent=nec+" · Para: "+(destinatario.area?destinatario.area+", ":"")+destinatario.entidad+" · "+r.fecha+" "+r.hora+" (hora de Lima)";
+      window.scrollTo({top:0, behavior:"smooth"});
+    } else { avisoEn("aviso","err", msg(r.error)+(r.quedan?" Le quedan "+r.quedan+" intento(s).":"")); $("enviar").disabled=false; }
+  }catch(e){ avisoEn("aviso","err",msg("servidor")); $("enviar").disabled=false; }
+});
+</script>
+</body>
+</html>
