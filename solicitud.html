@@ -144,6 +144,10 @@ footer{text-align:center; font-size:11.5px; color:var(--ink-soft); margin-top:24
     <div class="field"><label>Fotografías (máximo 2)</label>
       <input type="file" id="fotoInput" accept="image/*" multiple>
       <div class="fotos" id="fotos"></div></div>
+    <div class="field"><label>Documentos en PDF (opcional, máximo 2, hasta 3 MB cada uno)</label>
+      <input type="file" id="pdfInput" accept="application/pdf,.pdf" multiple>
+      <div class="ayuda">Por ejemplo: un reclamo anterior, un informe o un plano.</div>
+      <div id="pdfs"></div></div>
     <div class="field"><label>Firma del solicitante</label>
       <div class="pad-wrap" id="padWrap"><canvas id="pad" width="600" height="240"></canvas><div class="pad-hint">Firme aquí</div></div>
       <div class="pad-tools"><span>Firme con el dedo o el mouse.</span><button type="button" class="btn-link" id="borrar">Borrar y volver a firmar</button></div></div>
@@ -184,6 +188,7 @@ const MENSAJES = {
   datos:"Revise los datos: complete todos los campos obligatorios.",
   maps:"El enlace no es de Google Maps. Cópielo desde Google Maps con la opción Compartir.",
   foto:"Una de las fotos no es válida. Quítela y vuelva a adjuntarla.",
+  pdf:"Uno de los documentos no es un PDF válido o pesa más de 3 MB.",
   firma:"La firma no es válida. Bórrela y vuelva a firmar.",
   acepto:"Debe marcar la casilla de conformidad.",
   destino:"Elija a quién se dirige la solicitud o escriba la entidad.",
@@ -195,7 +200,7 @@ function avisoEn(id, cls, t){ const a=$(id); a.innerHTML=""; a.appendChild(el("d
 async function apiGet(params){ const r = await fetch(API_URL + "?" + new URLSearchParams(params).toString()); return r.json(); }
 async function apiPost(obj){ const r = await fetch(API_URL, { method:"POST", headers:{ "Content-Type":"text/plain;charset=utf-8" }, body: JSON.stringify(obj) }); return r.json(); }
 
-let cred = null, tipo = null, fotos = [];
+let cred = null, tipo = null, fotos = [], pdfs = [];
 
 /* ---------- identificación ---------- */
 ["dni","dv","tel4"].forEach(id=>{ $(id).addEventListener("input", ()=>{ $("avisoDni").innerHTML=""; });
@@ -282,9 +287,33 @@ function pintarFotos(){
     const b=el("button",null,"×"); b.type="button"; b.title="Quitar"; b.onclick=()=>{ fotos.splice(i,1); pintarFotos(); };
     fig.appendChild(im); fig.appendChild(b); f.appendChild(fig); });
 }
+/* ---------- documentos PDF ---------- */
+const MAX_PDF = 3 * 1024 * 1024;
+function leerPdf(file){
+  return new Promise((ok,mal)=>{ const r=new FileReader(); r.onload=()=>ok(r.result); r.onerror=()=>mal(new Error("pdf")); r.readAsDataURL(file); });
+}
+function pintarPdfs(){
+  const box=$("pdfs"); box.innerHTML="";
+  pdfs.forEach((d,i)=>{ const row=el("div","persona"); row.style.marginTop="6px";
+    row.appendChild(el("span",null,"📄 "+d.nombre+" ("+Math.round(d.bytes/1024)+" KB)"));
+    const b=el("button",null,"Quitar"); b.type="button"; b.onclick=()=>{ pdfs.splice(i,1); pintarPdfs(); };
+    row.appendChild(b); box.appendChild(row); });
+}
+$("pdfInput").addEventListener("change", async e=>{
+  for(const file of Array.from(e.target.files)){
+    if(pdfs.length>=2){ avisoEn("aviso","err","Máximo 2 documentos PDF."); break; }
+    if(!/\.pdf$/i.test(file.name) && file.type!=="application/pdf"){ avisoEn("aviso","err","\""+file.name+"\" no es un PDF."); continue; }
+    if(file.size>MAX_PDF){ avisoEn("aviso","err","\""+file.name+"\" pesa más de 3 MB. Redúzcalo o envíe solo las páginas necesarias."); continue; }
+    try{ let d=await leerPdf(file); d=d.replace(/^data:[^;]*;base64,/,"data:application/pdf;base64,");
+      pdfs.push({ nombre:file.name.slice(0,80), bytes:file.size, data:d }); }
+    catch(_){ avisoEn("aviso","err","No se pudo leer \""+file.name+"\"."); }
+  }
+  e.target.value=""; pintarPdfs();
+});
 $("fotoInput").addEventListener("change", async e=>{
   for(const file of Array.from(e.target.files)){ if(fotos.length>=2) break;
-    try{ fotos.push(await reducir(file)); }catch(_){ avisoEn("aviso","err","No se pudo leer una de las fotos."); } }
+    if(file.type==="application/pdf" || /\.pdf$/i.test(file.name)){ avisoEn("aviso","err","Los PDF van en \"Documentos en PDF\", debajo de las fotografías."); continue; }
+    try{ fotos.push(await reducir(file)); }catch(_){ avisoEn("aviso","err","No se pudo leer \""+file.name+"\". Si es una foto de iPhone (HEIC), tómele una captura de pantalla y adjunte la captura."); } }
   e.target.value=""; pintarFotos();
 });
 
@@ -321,7 +350,8 @@ $("enviar").addEventListener("click", async ()=>{
   $("enviar").disabled=true; avisoEn("aviso","info","Enviando y generando la carta… puede tardar unos segundos.");
   try{
     const r = await apiPost({ accion:"solicitud", dni:cred.dni, dv:cred.dv, tel4:cred.tel4, datos, datosOk:true,
-      necesidad:nec, destinatario, calles, maps, descripcion:desc, fotos, firma:cv.toDataURL("image/png") });
+      necesidad:nec, destinatario, calles, maps, descripcion:desc, fotos,
+      pdfs: pdfs.map(x=>({ nombre:x.nombre, data:x.data })), firma:cv.toDataURL("image/png") });
     if(r.ok){
       $("card1").classList.add("hidden"); $("card2").classList.add("hidden"); $("listo").classList.remove("hidden");
       $("listoCod").textContent=r.numero; $("listoTxt").textContent=nec+" · Para: "+(destinatario.area?destinatario.area+", ":"")+destinatario.entidad+" · "+r.fecha+" "+r.hora+" (hora de Lima)";
